@@ -1,0 +1,31 @@
+<div>
+  <div class="panel define-groups-shell">
+    <section class="define-groups-header">
+      <app-expansion-panel-header
+        [isOpenSignal]="infoHeaderPanel"
+        [panelTitle]="'Client Info'"
+      >
+      </app-expansion-panel-header>
+    </section>
+    <div class="from-grid form-grid-2-col gap-x-10">
+      <div>
+        <input-text-box
+          [frmGroup]="group"
+          [label]="'Client Name'"
+          [controlName]="'clientName'"
+        />
+        <generic-button [value]="'Create'" (click)="onGenIdClick()" [hidden]="isEditMode"/>
+      </div>
+
+      <!-- disabled this part -->
+      <input-id-box
+        [frmGroup]="group"
+        [label]="'Client ID'"
+        [controlName]="'clientId'"
+        [ariaDisabled]="true"
+        [isReadonly]="true"
+        [isDotsVisible]="false"
+      />
+    </div>
+  </div>
+</div>

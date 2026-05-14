@@ -1,0 +1,58 @@
+<div>
+  <div class="panel define-groups-shell">
+    <section class="define-groups-header">
+      <app-expansion-panel-header
+        [isOpenSignal]="detailsHeaderPanel"
+        [panelTitle]="'Client Details'"
+      >
+      </app-expansion-panel-header>
+    </section>
+    <div class="from-grid form-grid-3-col gap-x-4">
+      <input-text-box
+        [frmGroup]="group"
+        [label]="'Father Name'"
+        [controlName]="'fatherName'"
+      />
+
+      <input-text-box
+        [frmGroup]="group"
+        [label]="'Mother Name'"
+        [controlName]="'motherName'"
+      />
+
+      <input-date
+        [frmGroup]="group"
+        [label]="'Date of Birth'"
+        [controlName]="'dateOfBirth'"
+        [dateFormat]="'DD/MM/YYYY'"
+      />
+
+      <input-select-option-field
+        [frmGroup]="group"
+        [label]="'Gender'"
+        [controlName]="'gender'"
+        [options]="genderList"
+        [isReadonly]="group.disabled"
+      />
+
+      <input-select-option-field
+        [frmGroup]="group"
+        [label]="'Marital Status'"
+        [controlName]="'maritalStatus'"
+        [options]="maritalStatusList"
+        [isReadonly]="group.disabled"
+      />
+      <input-text-box
+        [frmGroup]="group"
+        [label]="'Spouse Name'"
+        [controlName]="'spouseName'"
+      />
+
+      <input-number
+        [frmGroup]="group"
+        [label]="'NID Number'"
+        [controlName]="'nidNumber'"
+      />
+    </div>
+  </div>
+</div>

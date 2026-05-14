@@ -1,0 +1,87 @@
+<div>
+  <div class="panel define-groups-shell">
+    <section class="define-groups-header">
+      <app-expansion-panel-header
+        [isOpenSignal]="addressHeaderPanel"
+        [panelTitle]="'Address and Contact'"
+      >
+      </app-expansion-panel-header>
+    </section>
+    <div class="from-grid form-grid-3-col gap-x-4">
+      <input-select-option-field
+        [frmGroup]="group"
+        [label]="'Address Type'"
+        [controlName]="'addressType'"
+        [options]="addressTypeOptions"
+        [isReadonly]="group.disabled"
+      />
+
+      <input-select-option-field
+        [frmGroup]="group"
+        [label]="'Country'"
+        [controlName]="'country'"
+        [options]="countryOptions"
+        [isReadonly]="group.disabled"
+        (onSelect)="onCountrySelected($event.selectedValue)"
+      />
+
+      <input-select-option-field
+        [frmGroup]="group"
+        [label]="'Division'"
+        [controlName]="'division'"
+        [options]="divisionOptions"
+        [isReadonly]="group.disabled"
+        (onSelect)="onDivisionSelected($event.selectedValue)"
+      />
+
+      <input-select-option-field
+        [frmGroup]="group"
+        [label]="'District'"
+        [controlName]="'district'"
+        [options]="districtOptions"
+        [isReadonly]="group.disabled"
+        (onSelect)="onDistrictSelected($event.selectedValue)"
+      />
+
+      <input-select-option-field
+        [frmGroup]="group"
+        [label]="'Thana'"
+        [controlName]="'thana'"
+        [options]="thanaOptions"
+        [isReadonly]="group.disabled"
+      />
+
+      <input-text-box
+        [frmGroup]="group"
+        [label]="'City'"
+        [controlName]="'city'"
+      />
+
+      <input-number
+        [frmGroup]="group"
+        [label]="'Zip Code'"
+        [controlName]="'zipCode'"
+      />
+
+      <input-text-box
+        [frmGroup]="group"
+        [label]="'Mobile No'"
+        [controlName]="'mobileNumber'"
+        type="'tel'"
+      />
+
+      <input-text-box
+        [frmGroup]="group"
+        [label]="'Email'"
+        [controlName]="'email'"
+        type="email"
+      />
+
+      <input-text-area
+        [frmGroup]="group"
+        [label]="'Address'"
+        [controlName]="'address'"
+      />
+    </div>
+  </div>
+</div>

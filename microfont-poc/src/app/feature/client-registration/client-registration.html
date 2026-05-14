@@ -1,0 +1,24 @@
+<form
+  class="gap-y-4 flex flex-col"
+  [formGroup]="clientForm"
+  (ngSubmit)="onSubmit()"
+>
+  <app-client-info
+    [group]="clientInfoForm"
+    (genIdClicked)="onGenIdClick()"
+    [isEditMode]="mode == 'edit'"
+  />
+  <app-client-details [group]="clientDetailsForm" />
+  <app-client-address
+    [group]="clientAddressForm"
+    [addressTypeList]="addressTypes"
+    [countryList]="countries"
+    [divisionList]="divisions"
+    [districtList]="districts"
+    [thanaList]="thanas"
+    (countrySelected)="onCountrySelected($event)"
+    (divisionSelected)="onDivisionSelected($event)"
+    (districtSelected)="onDistrictSelected($event)"
+  />
+  <app-client-accountinfo [group]="accountInfoForm" />
+</form>

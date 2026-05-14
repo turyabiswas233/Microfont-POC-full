@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.leads.microcube</groupId>
+        <artifactId>microcube.platform</artifactId>
+        <version>0.8.1</version>
+    </parent>
+
+    <groupId>com.leads.sandbox</groupId>
+    <artifactId>microcube.sandbox</artifactId>
+    <version>0.1.0</version>
+    <packaging>pom</packaging>
+    <name>sandbox</name>
+
+    <modules>
+        <module>sandbox-api</module>
+        <module>sandbox-provider</module>
+        <module>sandbox-service</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.leads.sandbox</groupId>
+                <artifactId>microcube.sandbox-api</artifactId>
+                <version>0.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.leads.sandbox</groupId>
+                <artifactId>microcube.sandbox-service</artifactId>
+                <version>0.1.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

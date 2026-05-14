@@ -1,0 +1,14 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.leads.sandbox</groupId>
+        <artifactId>microcube.sandbox</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
+    <artifactId>microcube.sandbox-api</artifactId>
+    <packaging>jar</packaging>
+    <name>sandbox-api</name>
+
+</project>

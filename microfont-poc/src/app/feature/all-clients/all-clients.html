@@ -1,0 +1,171 @@
+<div>
+  <generic-button
+    (click)="handleCreateNew()"
+    [icon]="'add'"
+    [value]="'Create New Client'"
+  />
+  <generic-data-grid
+    [id]="'user-dashboard-grid'"
+    [dataSource]="clients"
+    [selectedColumns]="columns"
+    [customColumnNames]="columnLabels"
+    [gridTitle]="'Clients'"
+    [initPageSize]="10"
+    [searchEnabled]="true"
+    [useInlineEdit]="false"
+    [showDeleteButton]="true"
+    [showEditButton]="true"
+    [showViewButton]="true"
+    (onFHEditClick)="handleEdit($event)"
+    (onFHDeleteClick)="handleDelete($event)"
+    (onFHViewClick)="handleModalView($event)"
+  />
+
+  <generic-modal
+    [modalTitle]="'Client Details'"
+    (modalClosed)="onModalClosed()"
+    (modalCancelled)="onModalClosed()"
+    [isVisible]="this.selectedClient != null"
+  >
+    <div class="modal-dialog">
+      <div class="max-h-[60vh]">
+        <div class="panel define-groups-shell">
+          <section class="define-groups-header">
+            <app-expansion-panel-header
+              [isOpenSignal]="infoHeaderPanel"
+              [panelTitle]="'Client Information'"
+            >
+            </app-expansion-panel-header>
+          </section>
+          <!-- client details -->
+          <div>
+            <h2>
+              Personal Details
+              <hr /> <br />
+            </h2>
+            <div class="from-grid form-grid-3-col gap-x-2">
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Client Name'"
+                [controlName]="'clientName'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Father Name'"
+                [controlName]="'fatherName'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Mother Name'"
+                [controlName]="'motherName'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Gender'"
+                [controlName]="'gender'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Marital Status'"
+                [controlName]="'maritalStatus'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+
+              <input-date
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Date of Birth'"
+                [controlName]="'dateOfBirth'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'NID'"
+                [controlName]="'nidNumber'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+            </div>
+          </div>
+
+          <!-- client address -->
+          <div>
+            <h2>
+              Contact and Address
+              <hr /> <br />
+            </h2>
+
+            <div class="from-grid form-grid-3-col gap-x-2">
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Mobile No'"
+                [controlName]="'mobileNumber'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Email'"
+                [controlName]="'email'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'City'"
+                [controlName]="'city'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+            </div>
+          </div>
+          <!-- account information -->
+          <div>
+            <h2>
+              Account Information
+              <hr /> <br />
+            </h2>
+
+            <div class="from-grid form-grid-3-col gap-x-2">
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Account Number'"
+                [controlName]="'accountNumber'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Account title'"
+                [controlName]="'accountTitle'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="personalDetailsGroup"
+                [label]="'Limit Amount'"
+                [controlName]="'limit'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </generic-modal>
+</div>
