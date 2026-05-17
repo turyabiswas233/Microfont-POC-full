@@ -80,7 +80,6 @@ export class AllClients implements OnInit {
               ),
             };
           });
-        console.log(records.length, this.clients.length);
       },
       error: (error) => {
         console.error('Failed to load clients list', error);

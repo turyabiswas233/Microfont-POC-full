@@ -2,7 +2,7 @@ package com.leads.sandbox.test.project.register.command;
 
 import java.util.Date;
 
-public class RegisterClientDetails {
+public class SaveClientDetails {
     private long clientId;
     private String clientName;
     private String fatherName;

@@ -1,8 +1,7 @@
 package com.leads.sandbox.test.project.register.service;
 
 import com.leads.sandbox.test.project.register.command.*;
-import com.leads.sandbox.test.project.register.query.RetrieveClient;
-import com.leads.sandbox.test.project.register.query.RetrieveClientInfo;
+import com.leads.sandbox.test.project.register.query.*;
 
 import java.util.List;
 
@@ -12,27 +11,23 @@ public interface ClientService {
     List<RetrieveClient> retrieveAllClients();
     RetrieveClient retrieveClient(Long clientId);
 
+    List<RetrieveClientAddressList> retrieveClientsAddresses ();
+
     boolean registerFullClient(
             Long clientId,
-            RegisterClientDetails registerClientDetails,
-            RegisterClientAddress registerClientAddress,
-            RegisterClientAccountInfo registerClientAccountInfo);
-
-    void createClientDetails(Long clientId, RegisterClientDetails registerClientDetails);
-
-    void createClientAddress(Long clientId, RegisterClientAddress registerClientAddress);
-
-    void createClientAccountInfo(Long clientId, RegisterClientAccountInfo registerClientAccountInfo);
-
-    void updateClientDetails(Long clientId, RegisterClientDetails registerClientDetails);
-
-    void updateClientAddress(Long clientId, RegisterClientAddress registerClientAddress);
-
-    void updateClientAccountInfo(Long clientId, RegisterClientAccountInfo registerClientAccountInfo);
-
+            SaveClientDetails saveClientDetails,
+            SaveClientAddress saveClientAddress,
+            SaveClientAccountInfo saveClientAccountInfo);
 
     boolean deleteFullClient(Long clientId);
+    boolean deleteClientAddress(Long clientId);
+    boolean deleteClientAccountInfo(Long clientId);
 
-    RetrieveClient updateFullClient(Long clientId, RegisterClientDetails registerClientDetails, RegisterClientAddress registerClientAddress, RegisterClientAccountInfo registerClientAccountInfo);
+    boolean saveClientAddress(Long clientId, SaveClientAddress saveClientAddress);
+    boolean saveClientAccountInfo(Long clientId, SaveClientAccountInfo saveClientAccountInfo);
+
+    RetrieveClient updateFullClient(Long clientId, SaveClientDetails saveClientDetails, SaveClientAddress saveClientAddress, SaveClientAccountInfo saveClientAccountInfo);
+
+    List<RetrieveClientAccountInfoList> retrieveClientsAccountInfoList();
 }
 

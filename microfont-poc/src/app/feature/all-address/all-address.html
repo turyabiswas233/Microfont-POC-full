@@ -1,0 +1,219 @@
+<div>
+  <generic-data-grid
+    [id]="'client-address-grid'"
+    [dataSource]="clientAddresses"
+    [selectedColumns]="columns"
+    [customColumnNames]="columnLabels"
+    [gridTitle]="'Client Addresses'"
+    [initPageSize]="10"
+    [searchEnabled]="true"
+    [useInlineEdit]="false"
+    [showDeleteButton]="true"
+    [showEditButton]="true"
+    [showViewButton]="true"
+    (onFHDeleteClick)="handleDelete($event)"
+    (onFHViewClick)="handleModalView($event)"
+    (onFHEditClick)="handleModalEdit($event)"
+  />
+
+  <generic-modal
+    [modalTitle]="'Client Address Details'"
+    (modalClosed)="onModalClosed()"
+    (modalCancelled)="onModalClosed()"
+    [isVisible]="this.selectedAddress != null"
+  >
+    <div class="modal-dialog">
+      <div class="max-h-[60vh]">
+        <div class="panel define-groups-shell">
+          <section class="define-groups-header">
+            <app-expansion-panel-header
+              [isOpenSignal]="infoHeaderPanel"
+              [panelTitle]="'Address Information'"
+            >
+            </app-expansion-panel-header>
+          </section>
+
+          <div>
+            <h2>
+              Client Information
+              <hr />
+              <br />
+            </h2>
+            <div class="from-grid form-grid-3-col gap-x-2">
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Client ID'"
+                [controlName]="'clientId'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Client Name'"
+                [controlName]="'clientName'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h2>
+              Address Details
+              <hr />
+              <br />
+            </h2>
+            <div class="from-grid form-grid-3-col gap-x-2">
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Address Type'"
+                [controlName]="'addressType'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Country'"
+                [controlName]="'country'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Division'"
+                [controlName]="'division'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'District'"
+                [controlName]="'district'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Thana'"
+                [controlName]="'thana'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'City'"
+                [controlName]="'city'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Zip Code'"
+                [controlName]="'zipCode'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Address'"
+                [controlName]="'address'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h2>
+              Contact Details
+              <hr />
+              <br />
+            </h2>
+            <div class="from-grid form-grid-3-col gap-x-2">
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Mobile No'"
+                [controlName]="'mobileNumber'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="addressDetailsGroup"
+                [label]="'Email'"
+                [controlName]="'email'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </generic-modal>
+
+  <generic-modal
+    [modalTitle]="'Edit Client Address'"
+    (modalClosed)="onEditModalClosed()"
+    (modalCancelled)="onEditModalClosed()"
+    [isVisible]="this.editAddressRow != null"
+  >
+    <div class="modal-dialog">
+      <div class="max-h-[70vh]">
+        <div class="panel define-groups-shell">
+          <section class="define-groups-header">
+            <app-expansion-panel-header
+              [isOpenSignal]="editInfoHeaderPanel"
+              [panelTitle]="'Edit Address Information'"
+            />
+          </section>
+          <div class="from-grid form-grid-3-col gap-x-2">
+            <input-text-box
+              [frmGroup]="editAddressGroup"
+              [label]="'Client ID'"
+              [controlName]="'clientId'"
+              [ariaDisabled]="true"
+              [isReadonly]="true"
+            />
+            <input-text-box
+              [frmGroup]="editAddressGroup"
+              [label]="'Client Name'"
+              [controlName]="'clientName'"
+              [ariaDisabled]="true"
+              [isReadonly]="true"
+            />
+          </div>
+        </div>
+        <br />
+        <app-client-address
+          [group]="editAddressGroup"
+          [addressTypeList]="addressTypes"
+          [countryList]="countries"
+          [divisionList]="divisions"
+          [districtList]="districts"
+          [thanaList]="thanas"
+          (countrySelected)="onEditCountrySelected($event)"
+          (divisionSelected)="onEditDivisionSelected($event)"
+          (districtSelected)="onEditDistrictSelected($event)"
+        />
+
+        @if (editErrorMessage) {
+          <p class="text-sm text-red-500 mt-3">{{ editErrorMessage }}</p>
+        }
+      </div>
+      <br />
+      <div class="flex justify-end gap-2">
+        <generic-button
+          [label]="'Cancel'"
+          [cssClass]="'bg-slate-200 text-slate-700 hover:opacity-90'"
+          (onClick)="onEditModalClosed()"
+        />
+        <generic-button
+          [label]="isSavingEdit ? 'Saving...' : 'Save'"
+          [enable]="!isSavingEdit"
+          [cssClass]="'bg-blue-600 text-white hover:opacity-90'"
+          (onClick)="saveEdit()"
+        />
+      </div>
+    </div>
+  </generic-modal>
+</div>

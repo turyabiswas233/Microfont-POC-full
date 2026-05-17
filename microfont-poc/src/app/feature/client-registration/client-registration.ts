@@ -300,18 +300,6 @@ export class ClientRegistration {
     this.clientForm.reset();
   }
 
-  loadClients(): void {
-    this.clientService.getClients().subscribe({
-      next: (clients) => {
-        this.clients = clients;
-        this.errorMessage = null;
-      },
-      error: () => {
-        this.errorMessage = 'Failed to load clients.';
-      },
-    });
-  }
-
   loadClient(id: number): void {
     this.clientService.getClientById(id).subscribe({
       next: (client) => {
@@ -398,58 +386,68 @@ export class ClientRegistration {
       this.addressTypes = await firstValueFrom(this.addressService.getTypes());
 
       step = 'addressType';
-      const addressType = await firstValueFrom(
-        this.addressService.getAddressType(address.addressType),
-      );
-      this.clientAddressForm
-        .get('addressType')
-        ?.setValue(addressType.addressTypeName);
+      if (this.addressTypes.some((at) => at.id === address.addressType)) {
+        const addressType = await firstValueFrom(
+          this.addressService.getAddressType(address.addressType),
+        );
+        this.clientAddressForm
+          .get('addressType')
+          ?.setValue(addressType.addressTypeName);
+      }
 
       step = 'countries';
+
       this.countries = await firstValueFrom(this.addressService.getCountries());
+      if (this.countries.some((c) => c.id === address.country)) {
+        step = 'country';
+        const country = await firstValueFrom(
+          this.addressService.getCountry(address.country),
+        );
+        this.clientAddressForm.get('country')?.setValue(country.countryName);
 
-      step = 'country';
-      const country = await firstValueFrom(
-        this.addressService.getCountry(address.country),
-      );
-      this.clientAddressForm.get('country')?.setValue(country.countryName);
+        step = 'divisions';
+        this.divisions = await firstValueFrom(
+          this.addressService.getDivisionsByCountry(
+            this.countries,
+            country.countryName,
+          ),
+        );
+        if (this.divisions.some((d) => d.id === address.division)) {
+          step = 'division';
+          const division = await firstValueFrom(
+            this.addressService.getDivision(address.division),
+          );
+          this.clientAddressForm
+            .get('division')
+            ?.setValue(division.divisionName);
 
-      step = 'divisions';
-      this.divisions = await firstValueFrom(
-        this.addressService.getDivisionsByCountry(
-          this.countries,
-          country.countryName,
-        ),
-      );
+          step = 'districts';
+          this.districts = await firstValueFrom(
+            this.addressService.getDistrictsByDivision(
+              this.divisions,
+              division.divisionName,
+            ),
+          );
 
-      step = 'division';
-      const division = await firstValueFrom(
-        this.addressService.getDivision(address.division),
-      );
-      this.clientAddressForm.get('division')?.setValue(division.divisionName);
+          if (this.districts.some((d) => d.id === address.district)) {
+            step = 'district';
+            const district = await firstValueFrom(
+              this.addressService.getDistrict(address.district),
+            );
+            this.clientAddressForm
+              .get('district')
+              ?.setValue(district.districtName);
 
-      step = 'districts';
-      this.districts = await firstValueFrom(
-        this.addressService.getDistrictsByDivision(
-          this.divisions,
-          division.divisionName,
-        ),
-      );
-
-      step = 'district';
-      const district = await firstValueFrom(
-        this.addressService.getDistrict(address.district),
-      );
-      this.clientAddressForm.get('district')?.setValue(district.districtName);
-
-      step = 'thanas';
-      this.thanas = await firstValueFrom(
-        this.addressService.getThanasByDistrict(
-          this.districts,
-          district.districtName,
-        ),
-      );
-
+            step = 'thanas';
+            this.thanas = await firstValueFrom(
+              this.addressService.getThanasByDistrict(
+                this.districts,
+                district.districtName,
+              ),
+            );
+          }
+        }
+      }
       step = 'thana';
       const thana = await firstValueFrom(
         this.addressService.getThana(address.thana),
@@ -536,6 +534,11 @@ export class ClientRegistration {
       registerClientDetails: this.clientDetailsForm.value,
       registerClientAddress: {
         ...this.clientAddressForm.value,
+        addressType: this.addressTypes.find(
+          (at) =>
+            at.addressTypeName ===
+            this.clientAddressForm.get('addressType')?.value,
+        )?.id,
         country: this.countries.find(
           (c) => c.countryName === this.clientAddressForm.get('country')?.value,
         )?.id,
@@ -582,7 +585,6 @@ export class ClientRegistration {
       next: (client) => {
         this.isSaving = false;
         this.clientId = client.id;
-        this.loadClients();
         this.errorMessage = null;
       },
       error: () => {
@@ -598,7 +600,6 @@ export class ClientRegistration {
       next: (client) => {
         this.isSaving = false;
         this.clientId = client.id;
-        this.loadClients();
         this.errorMessage = null;
       },
       error: () => {

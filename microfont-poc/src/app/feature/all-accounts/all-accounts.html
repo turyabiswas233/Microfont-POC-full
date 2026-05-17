@@ -1,0 +1,171 @@
+<div>
+  <generic-data-grid
+    [id]="'client-account-grid'"
+    [dataSource]="clientAccounts"
+    [selectedColumns]="columns"
+    [customColumnNames]="columnLabels"
+    [gridTitle]="'Client Accounts'"
+    [initPageSize]="10"
+    [searchEnabled]="true"
+    [useInlineEdit]="false"
+    [showDeleteButton]="true"
+    [showEditButton]="true"
+    [showViewButton]="true"
+    (onFHDeleteClick)="handleDelete($event)"
+    (onFHViewClick)="handleModalView($event)"
+    (onFHEditClick)="handleModalEdit($event)"
+  />
+
+  <generic-modal
+    [modalTitle]="'Client Account Details'"
+    (modalClosed)="onModalClosed()"
+    (modalCancelled)="onModalClosed()"
+    [isVisible]="this.selectedAccount != null"
+  >
+    <div class="modal-dialog">
+      <div class="max-h-[60vh]">
+        <div class="panel define-groups-shell">
+          <section class="define-groups-header">
+            <app-expansion-panel-header
+              [isOpenSignal]="infoHeaderPanel"
+              [panelTitle]="'Account Information'"
+            >
+            </app-expansion-panel-header>
+          </section>
+
+          <div>
+            <h2>
+              Client Information
+              <hr />
+              <br />
+            </h2>
+            <div class="from-grid form-grid-3-col gap-x-2">
+              <input-text-box
+                [frmGroup]="accountDetailsGroup"
+                [label]="'Client ID'"
+                [controlName]="'clientId'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="accountDetailsGroup"
+                [label]="'Client Name'"
+                [controlName]="'clientName'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h2>
+              Account Details
+              <hr />
+              <br />
+            </h2>
+            <div class="from-grid form-grid-3-col gap-x-2">
+              <input-text-box
+                [frmGroup]="accountDetailsGroup"
+                [label]="'Office Code'"
+                [controlName]="'officeCode'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="accountDetailsGroup"
+                [label]="'Account Number'"
+                [controlName]="'accountNumber'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="accountDetailsGroup"
+                [label]="'Account Title'"
+                [controlName]="'accountTitle'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-date
+                [frmGroup]="accountDetailsGroup"
+                [label]="'Account Open Date'"
+                [controlName]="'accountOpenDate'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-date
+                [frmGroup]="accountDetailsGroup"
+                [label]="'Account Expiry Date'"
+                [controlName]="'accountExpiryDate'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+              <input-text-box
+                [frmGroup]="accountDetailsGroup"
+                [label]="'Limit Amount'"
+                [controlName]="'limitAmount'"
+                [ariaDisabled]="true"
+                [isReadonly]="true"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </generic-modal>
+
+  <generic-modal
+    [modalTitle]="'Edit Client Account'"
+    (modalClosed)="onEditModalClosed()"
+    (modalCancelled)="onEditModalClosed()"
+    [isVisible]="this.editAccountRow != null"
+  >
+    <div class="modal-dialog">
+      <div class="max-h-[70vh]">
+        <div class="panel define-groups-shell">
+          <section class="define-groups-header">
+            <app-expansion-panel-header
+              [isOpenSignal]="editInfoHeaderPanel"
+              [panelTitle]="'Edit Account Information'"
+            />
+          </section>
+          <div class="from-grid form-grid-3-col gap-x-2">
+            <input-text-box
+              [frmGroup]="editAccountGroup"
+              [label]="'Client ID'"
+              [controlName]="'clientId'"
+              [ariaDisabled]="true"
+              [isReadonly]="true"
+            />
+            <input-text-box
+              [frmGroup]="editAccountGroup"
+              [label]="'Client Name'"
+              [controlName]="'clientName'"
+              [ariaDisabled]="true"
+              [isReadonly]="true"
+            />
+          </div>
+        </div>
+        <br />
+        <app-client-accountinfo [group]="editAccountGroup" />
+
+        @if (editErrorMessage) {
+          <p class="text-sm text-red-500 mt-3">{{ editErrorMessage }}</p>
+        }
+      </div>
+      <br />
+      <div class="flex justify-end gap-2">
+        <generic-button
+          [label]="'Cancel'"
+          [cssClass]="'bg-slate-200 text-slate-700 hover:opacity-90'"
+          (onClick)="onEditModalClosed()"
+        />
+        <generic-button
+          [label]="isSavingEdit ? 'Saving...' : 'Save'"
+          [enable]="!isSavingEdit"
+          [cssClass]="'bg-blue-600 text-white hover:opacity-90'"
+          (onClick)="saveEdit()"
+        />
+      </div>
+    </div>
+  </generic-modal>
+</div>

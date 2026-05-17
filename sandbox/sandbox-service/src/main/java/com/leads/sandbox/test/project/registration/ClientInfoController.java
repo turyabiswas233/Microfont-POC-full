@@ -2,7 +2,11 @@ package com.leads.sandbox.test.project.registration;
 
 import com.leads.sandbox.test.project.register.command.RegisterClient;
 import com.leads.sandbox.test.project.register.command.RegisterClientId;
+import com.leads.sandbox.test.project.register.command.SaveClientAccountInfo;
+import com.leads.sandbox.test.project.register.command.SaveClientAddress;
 import com.leads.sandbox.test.project.register.query.RetrieveClient;
+import com.leads.sandbox.test.project.register.query.RetrieveClientAccountInfoList;
+import com.leads.sandbox.test.project.register.query.RetrieveClientAddressList;
 import com.leads.sandbox.test.project.register.query.RetrieveClientInfo;
 import com.leads.sandbox.test.project.register.service.ClientService;
 import com.leads.sandbox.test.project.registration.implService.ClientServiceImpl;
@@ -35,16 +39,28 @@ public class ClientInfoController {
         return ResponseEntity.ok(clientService.registerClientId(registerClientId));
     }
 
-    @GetMapping
-    public ResponseEntity<List<RetrieveClient>> retrieveAllClientsList() {
-        return ResponseEntity.ok(clientService.retrieveAllClients());
-    }
-
     @PostMapping("/{clientId}/create")
     public ResponseEntity<Boolean> createClientDetails(@PathVariable Long clientId, @RequestBody @Valid RegisterClient request) {
         boolean isClientCreated = clientService.registerFullClient(clientId, request.getRegisterClientDetails(), request.getRegisterClientAddress(), request.getRegisterClientAccountInfo());
         return ResponseEntity.ok(isClientCreated);
     }
+
+    @PostMapping("/{clientId}/address")
+    public ResponseEntity<Boolean> saveClientAddress(@PathVariable Long clientId, @RequestBody @Valid SaveClientAddress request) {
+        boolean isSavedClientAddress = clientService.saveClientAddress(clientId, request);
+        return ResponseEntity.ok(isSavedClientAddress);
+    }
+    @PostMapping("/{clientId}/account")
+    public ResponseEntity<Boolean> saveClientAccountInfo(@PathVariable Long clientId, @RequestBody @Valid SaveClientAccountInfo request) {
+        boolean isSavedClientAddress = clientService.saveClientAccountInfo(clientId, request);
+        return ResponseEntity.ok(isSavedClientAddress);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<RetrieveClient>> retrieveAllClientsList() {
+        return ResponseEntity.ok(clientService.retrieveAllClients());
+    }
+
 
     @PutMapping("/{clientId}")
     public ResponseEntity<RetrieveClient> updateClient(@PathVariable Long clientId, @RequestBody @Valid RegisterClient request) {
@@ -57,10 +73,35 @@ public class ClientInfoController {
         RetrieveClient client = clientService.retrieveClient(clientId);
         return ResponseEntity.ok(client);
     }
+
+    @GetMapping("/address")
+    public ResponseEntity<List<RetrieveClientAddressList>> getClientAddressList() {
+        List<RetrieveClientAddressList> retrieveClientAddressLists = clientService.retrieveClientsAddresses();
+        return ResponseEntity.ok(retrieveClientAddressLists);
+    }
+
+    @GetMapping("/account")
+    public ResponseEntity<List<RetrieveClientAccountInfoList>> getClientAddress() {
+        List<RetrieveClientAccountInfoList> retrieveClientAccountInfoList = clientService.retrieveClientsAccountInfoList();
+        return ResponseEntity.ok(retrieveClientAccountInfoList);
+    }
+
     @DeleteMapping("/{clientId}")
     public ResponseEntity<Boolean> deleteClient(@PathVariable Long clientId) {
         boolean isClientDeleted = clientService.deleteFullClient(clientId);
         return ResponseEntity.ok(isClientDeleted);
+    }
+
+    @DeleteMapping("/{clientId}/address")
+    public ResponseEntity<Boolean> deleteClientAddress(@PathVariable Long clientId) {
+        boolean isClientAddressDeleted = clientService.deleteClientAddress(clientId);
+        return ResponseEntity.ok(isClientAddressDeleted);
+    }
+
+    @DeleteMapping("/{clientId}/account")
+    public ResponseEntity<Boolean> deleteClientAccountInfo(@PathVariable Long clientId) {
+        boolean isClientAccountDeleted = clientService.deleteClientAccountInfo(clientId);
+        return ResponseEntity.ok(isClientAccountDeleted);
     }
 
 }

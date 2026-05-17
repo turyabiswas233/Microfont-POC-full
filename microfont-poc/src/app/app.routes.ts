@@ -4,6 +4,8 @@ import { Landing } from './layout/landing/landing';
 import { AllComponentsPage } from './shared/common-components/test-component-page/all-components-page/all-components-page';
 import { AllClients } from './feature/all-clients/all-clients';
 import { ClientRegistration } from './feature/client-registration/client-registration';
+import { AllAddress } from './feature/all-address/all-address';
+import { AllAccounts } from './feature/all-accounts/all-accounts';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'landing/home', pathMatch: 'full' },
@@ -123,6 +125,34 @@ export const routes: Routes = [
         path: '',
         title: 'All Client List',
         component: AllClients,
+      },
+    ],
+  },
+  {
+    path: 'alladdress',
+    component: Layout,
+    data: {
+      layout: 'empty',
+    },
+    children: [
+      {
+        path: '',
+        title: 'All Addresses',
+        component: AllAddress,
+      },
+    ],
+  },
+  {
+    path: 'allaccounts',
+    component: Layout,
+    data: {
+      layout: 'empty',
+    },
+    children: [
+      {
+        path: '',
+        title: 'All Accounts',
+        component: AllAccounts,
       },
     ],
   },

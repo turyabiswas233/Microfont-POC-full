@@ -18,39 +18,41 @@ import { ButtonUtils } from './shared/constant/button-signals.constant';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 
-
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, LoaderComponent, CommonModule],
   templateUrl: './app.html',
   standalone: true,
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App implements OnInit {
   protected title = 'LdsComponentProject';
   authService = inject(AuthService);
   userId: string;
   private userService = inject(UserService);
-  constructor(private themeService: ThemeService,
+  constructor(
+    private themeService: ThemeService,
     public loaderService: LoaderService,
     private router: Router,
     private activityTracker: GlobalActivityTrackerService,
     private rootTitle: Title,
     private sidebarService: SidebarService,
-    private novuService: NovuService) {
-    this.router.events.pipe(filter(event => event instanceof NavigationEnd),
-      takeUntilDestroyed()
-    ).subscribe((event: NavigationEnd) => {
-      const url = event.urlAfterRedirects;
-      const resetRoutes = ['/', '/landing/home', '/dashboard'];
+    private novuService: NovuService,
+  ) {
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe((event: NavigationEnd) => {
+        const url = event.urlAfterRedirects;
+        const resetRoutes = ['/', '/landing/home', '/dashboard'];
 
-      if (resetRoutes.includes(url)) {
-        ButtonUtils.resetAll();
-      }
-    });
+        if (resetRoutes.includes(url)) {
+          ButtonUtils.resetAll();
+        }
+      });
   }
-
-
 
   async ngOnInit() {
     const isAuthenticated = await this.authService.init();
@@ -62,7 +64,9 @@ export class App implements OnInit {
       // Load resources with debugging
       this.authService.getResources().subscribe({
         next: (res) => {
-          localStorage.setItem('resourceList', JSON.stringify(res));
+          const resourceList = Array.isArray(res) ? res : (res?.data ?? []);
+          const mergedResources = this.addQuickMenuRoutes(resourceList);
+          localStorage.setItem('resourceList', JSON.stringify(mergedResources));
 
           // Verify storage
           const storedResources = localStorage.getItem('resourceList');
@@ -72,18 +76,16 @@ export class App implements OnInit {
         },
         error: (error) => {
           console.error('Error loading resources:', error);
-          localStorage.setItem('resourceList', '[]');
+          const mergedResources = this.addQuickMenuRoutes([]);
+          localStorage.setItem('resourceList', JSON.stringify(mergedResources));
           this.sidebarService.notifyResourceListReady();
-        }
+        },
       });
 
       // Load applications with debugging
       this.authService.getUserWiseApplications().subscribe({
         next: (res) => {
-
-
           localStorage.setItem('appList', JSON.stringify(res));
-
 
           // Verify storage
           const storedAppList = localStorage.getItem('appList');
@@ -98,9 +100,8 @@ export class App implements OnInit {
           console.error('Error loading applications:', error);
           localStorage.setItem('appList', '[]');
           this.sidebarService.notifyAppListReady();
-        }
+        },
       });
-
     } else {
       this.authService.login();
     }
@@ -120,7 +121,6 @@ export class App implements OnInit {
     }
   }
 
-
   private detectAndSetModuleByPort() {
     setTimeout(() => {
       try {
@@ -130,7 +130,7 @@ export class App implements OnInit {
         if (appList) {
           const parsedAppList = JSON.parse(appList);
           const matchingModule = parsedAppList.find((app: any) => {
-            if (app.appUrl && (environment.appId === app.appId)) {
+            if (app.appUrl && environment.appId === app.appId) {
               console.log(app.appId);
               const urlMatch = app.appUrl.match(/:(\d+)/);
               return urlMatch && urlMatch[1] === currentPort;
@@ -146,8 +146,85 @@ export class App implements OnInit {
         console.error('Error in app module detection:', error);
       }
     }, 500); // Longer delay to ensure everything is loaded
+  }
 
+  private addQuickMenuRoutes(resourceList: any[]): any[] {
+    const normalizedList = Array.isArray(resourceList) ? [...resourceList] : [];
+    const quickMenuItems = [
+      {
+        attributes: {
+          functionId: 'F9001',
+          functionName: 'Client Registration',
+          functionType: 'F',
+          moduleId: 'M900',
+          moduleName: 'Client Feature',
+          quickRoute: '9001',
+        },
+        routePath: '/client-registration',
+        uris: '/client-registration',
+      },
+      {
+        attributes: {
+          functionId: 'F9002',
+          functionName: 'All Clients',
+          functionType: 'F',
+          moduleId: 'M900',
+          moduleName: 'Client Feature',
+          quickRoute: '9002',
+        },
+        routePath: '/allclients',
+        uris: '/allclients',
+      },
+      {
+        attributes: {
+          functionId: 'F9003',
+          functionName: 'All Addresses',
+          functionType: 'F',
+          moduleId: 'M900',
+          moduleName: 'Client Feature',
+          quickRoute: '9003',
+        },
+        routePath: '/alladdress',
+        uris: '/alladdress',
+      },
+      {
+        attributes: {
+          functionId: 'F9004',
+          functionName: 'All Accounts',
+          functionType: 'F',
+          moduleId: 'M900',
+          moduleName: 'Client Feature',
+          quickRoute: '9004',
+        },
+        routePath: '/allaccounts',
+        uris: '/allaccounts',
+      },
+    ];
+
+    const normalize = (value?: string) => {
+      if (!value) return '';
+      return value.startsWith('/') ? value : `/${value}`;
+    };
+
+    const hasRoute = (item: any, route: string) => {
+      const routePath = Array.isArray(item?.routePath)
+        ? item.routePath[0]
+        : item?.routePath;
+      const uris = Array.isArray(item?.uris) ? item.uris[0] : item?.uris;
+      const targetRoute = normalize(route);
+      return (
+        normalize(routePath) === targetRoute || normalize(uris) === targetRoute
+      );
+    };
+
+    quickMenuItems.forEach((item) => {
+      if (
+        !normalizedList.some((existing) => hasRoute(existing, item.routePath))
+      ) {
+        normalizedList.push(item);
+      }
+    });
+
+    return normalizedList;
   }
 }
-
-
