@@ -3,6 +3,14 @@
   [formGroup]="clientForm"
   (ngSubmit)="onSubmit()"
 >
+  <app-custom-alert
+    [isOpen]="isSuccessModalOpen()"
+    [title]="successModalTitle()"
+    [message]="successModalMessage()"
+    [variant]="'success'"
+    (close)="closeSuccessModal()"
+    (buttonClick)="onSuccessModalButtonClick()"
+  />
   <app-client-info
     [group]="clientInfoForm"
     (genIdClicked)="onGenIdClick()"

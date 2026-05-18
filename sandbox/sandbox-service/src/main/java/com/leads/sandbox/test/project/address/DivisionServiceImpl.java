@@ -1,4 +1,4 @@
-package com.leads.sandbox.test.project.address.implService;
+package com.leads.sandbox.test.project.address;
 
 import com.leads.sandbox.test.project.address.query.RetrieveDivision;
 import com.leads.sandbox.test.project.address.repository.DivisionEntity;

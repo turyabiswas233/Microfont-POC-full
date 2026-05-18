@@ -16,6 +16,8 @@ import { InputDate } from '../../shared/common-components/input-types/input-date
 import { ClientAccountinfo } from '../client-accountinfo/client-accountinfo';
 import { GenericButton } from '../../shared/common-components/generic-component-type/generic-button/generic-button';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AlertVariant, CustomAlert } from '../custom-alert/custom-alert';
+import { ConfirmationDialogue } from '../../shared/common-components/confirmation-dialogue/confirmation-dialogue';
 
 type AccountGridRow = {
   retrieveClientInfo: {
@@ -47,6 +49,8 @@ const ACCOUNT_GRID_FIELDS = {
   selector: 'app-all-accounts',
   imports: [
     ClientAccountinfo,
+    CustomAlert,
+    ConfirmationDialogue,
     GenericDataGrid,
     GenericButton,
     GenericModal,
@@ -65,7 +69,6 @@ export class AllAccounts implements OnInit {
   editInfoHeaderPanel: WritableSignal<boolean> = signal(false);
   accountDetailsGroup: FormGroup;
   editAccountGroup: FormGroup;
-  editErrorMessage: string | null = null;
   isSavingEdit = false;
   columns = Object.keys(
     ACCOUNT_GRID_FIELDS,
@@ -74,6 +77,13 @@ export class AllAccounts implements OnInit {
 
   allAccountService = inject(ClientAccountService);
   router = inject(Router);
+  isSuccessModalOpen = signal(false);
+  successModalTitle = signal('Success!');
+  successModalMessage = signal('');
+  alertVariant: AlertVariant = 'success';
+  isDeleteConfirmationOpen = signal(false);
+  deleteMessage = signal('');
+  pendingDeleteClientId: number | null = null;
 
   ngOnInit(): void {
     this.loadClientAccounts();
@@ -124,21 +134,8 @@ export class AllAccounts implements OnInit {
   handleDelete(event: string): void {
     const clientId = this.parseGridEvent(event)?.retrieveClientInfo.clientId;
     console.log('Delete account for client ID:', clientId);
-
-    const confirmation = confirm(
-      'Are you sure you want to delete this account with client Id: ' +
-        clientId +
-        '?',
-    );
-    if (confirmation && clientId !== undefined && clientId !== null) {
-      this.allAccountService
-        .deleteClientAccount(numberAttribute(clientId))
-        .subscribe((isDeleted) => {
-          if (isDeleted) {
-            alert('Account deleted successfully.');
-            this.loadClientAccounts();
-          }
-        });
+    if (clientId !== undefined && clientId !== null) {
+      this.openDeleteConfirmation(clientId);
     }
   }
 
@@ -176,7 +173,6 @@ export class AllAccounts implements OnInit {
 
     this.selectedAccount = null;
     this.editAccountRow = row;
-    this.editErrorMessage = null;
 
     this.editAccountGroup.patchValue({
       clientId: row.retrieveClientInfo.clientId,
@@ -200,7 +196,6 @@ export class AllAccounts implements OnInit {
 
   onEditModalClosed(): void {
     this.editAccountRow = null;
-    this.editErrorMessage = null;
     this.editAccountGroup.reset();
   }
 
@@ -212,7 +207,8 @@ export class AllAccounts implements OnInit {
 
     const clientId = Number(this.editAccountGroup.get('clientId')?.value);
     if (!Number.isFinite(clientId)) {
-      alert('Client ID is missing.');
+      this.alertVariant = 'error';
+      this.openSuccessModal('Invalid client ID.');
       return;
     }
 
@@ -230,13 +226,14 @@ export class AllAccounts implements OnInit {
     this.allAccountService.updateClientAccount(clientId, payload).subscribe({
       next: () => {
         this.isSavingEdit = false;
-        alert('Account updated successfully.');
+        this.openSuccessModal('Account updated successfully.');
         this.onEditModalClosed();
         this.loadClientAccounts();
       },
       error: () => {
         this.isSavingEdit = false;
-        this.editErrorMessage = 'Failed to update account.';
+        this.alertVariant = 'error';
+        this.openSuccessModal('Failed to update account.');
       },
     });
   }
@@ -248,5 +245,60 @@ export class AllAccounts implements OnInit {
       console.error('Invalid grid row payload', error);
       return null;
     }
+  }
+
+  closeDeleteConfirmation(): void {
+    this.isDeleteConfirmationOpen.set(false);
+    this.deleteMessage.set('');
+    this.pendingDeleteClientId = null;
+  }
+
+  onDeleteConfirmationButtonClick(event: {
+    action: string;
+    button: { action?: string };
+  }): void {
+    if (event.action === 'confirm') {
+      const clientId = this.pendingDeleteClientId;
+      this.closeDeleteConfirmation();
+      if (clientId === null) {
+        return;
+      }
+      this.allAccountService
+        .deleteClientAccount(numberAttribute(clientId))
+        .subscribe((isDeleted) => {
+          if (isDeleted) {
+            this.alertVariant = 'success';
+            this.openSuccessModal('Account deleted successfully.');
+            this.loadClientAccounts();
+          } else {
+            this.alertVariant = 'error';
+            this.openSuccessModal('Failed to delete account.');
+          }
+        });
+    } else {
+      this.closeDeleteConfirmation();
+    }
+  }
+
+  closeSuccessModal(): void {
+    this.isSuccessModalOpen.set(false);
+    this.successModalMessage.set('');
+  }
+
+  onSuccessModalButtonClick(event: { action: string }): void {
+    this.closeSuccessModal();
+  }
+
+  private openSuccessModal(message: string): void {
+    this.successModalMessage.set(message);
+    this.isSuccessModalOpen.set(true);
+  }
+
+  private openDeleteConfirmation(clientId: number): void {
+    this.pendingDeleteClientId = clientId;
+    this.deleteMessage.set(
+      `Are you sure you want to delete this account with client Id: ${clientId}?`,
+    );
+    this.isDeleteConfirmationOpen.set(true);
   }
 }

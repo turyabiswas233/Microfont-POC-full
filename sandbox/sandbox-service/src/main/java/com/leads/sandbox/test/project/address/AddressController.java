@@ -1,8 +1,5 @@
 package com.leads.sandbox.test.project.address;
 
-import com.leads.sandbox.test.project.address.implService.AddressTypeServiceImpl;
-import com.leads.sandbox.test.project.address.implService.CountryServiceImpl;
-import com.leads.sandbox.test.project.address.implService.DivisionServiceImpl;
 import com.leads.sandbox.test.project.address.query.*;
 import com.leads.sandbox.test.project.address.service.*;
 import org.springframework.http.ResponseEntity;

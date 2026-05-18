@@ -18,6 +18,9 @@ import { GenericButton } from '../../shared/common-components/generic-component-
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { AlertVariant, CustomAlert } from '../custom-alert/custom-alert';
+import { InputTextArea } from '../../shared/common-components/input-types/input-text-area/input-text-area';
+import { ConfirmationDialogue } from '../../shared/common-components/confirmation-dialogue/confirmation-dialogue';
 
 type AddressGridRow = {
   retrieveClientInfo: {
@@ -62,6 +65,9 @@ const ADDRESS_GRID_FIELDS = {
     GenericModal,
     ExpansionPanelHeader,
     InputTextBox,
+    CustomAlert,
+    InputTextArea,
+    ConfirmationDialogue,
   ],
   templateUrl: './all-address.html',
   styleUrl: './all-address.scss',
@@ -105,6 +111,14 @@ export class AllAddress implements OnInit {
   clientService = inject(ClientAddressService);
   addressLookupService = inject(AddressLookupService);
   router = inject(Router);
+
+  isSuccessModalOpen = signal(false);
+  successModalTitle = signal('Success!');
+  successModalMessage = signal('');
+  alertVarient: AlertVariant = 'success';
+  isDeleteConfirmationOpen = signal(false);
+  deleteMessage = signal('');
+  pendingDeleteClientId: number | null = null;
 
   ngOnInit(): void {
     this.loadClientAddresses();
@@ -177,21 +191,8 @@ export class AllAddress implements OnInit {
   handleDelete(event: string): void {
     const clientId = this.parseGridEvent(event)?.retrieveClientInfo.clientId;
     console.log('Delete address for client ID:', clientId);
-
-    const confirmation = confirm(
-      'Are you sure you want to delete this address with client Id: ' +
-        clientId +
-        '?',
-    );
-    if (confirmation) {
-      this.clientService
-        .deleteClientAddress(numberAttribute(clientId))
-        .subscribe((isDeleted) => {
-          if (isDeleted) {
-            alert('Address deleted successfully.');
-            this.loadClientAddresses();
-          }
-        });
+    if (clientId !== undefined && clientId !== null) {
+      this.openDeleteConfirmation(clientId);
     }
   }
 
@@ -260,6 +261,41 @@ export class AllAddress implements OnInit {
     this.editAddressGroup.reset();
   }
 
+  closeDeleteConfirmation(): void {
+    this.isDeleteConfirmationOpen.set(false);
+    this.deleteMessage.set('');
+    this.pendingDeleteClientId = null;
+  }
+
+  onDeleteConfirmationButtonClick(event: {
+    action: string;
+    button: { action?: string };
+  }): void {
+    if (event.action === 'confirm') {
+      const clientId = this.pendingDeleteClientId;
+      this.closeDeleteConfirmation();
+      if (clientId === null) {
+        return;
+      }
+      this.clientService
+        .deleteClientAddress(numberAttribute(clientId))
+        .subscribe((isDeleted) => {
+          if (isDeleted) {
+            this.alertVarient = 'success';
+            this.openSuccessModal('Address deleted successfully.');
+            this.loadClientAddresses();
+          } else {
+            this.alertVarient = 'error';
+            this.openSuccessModal(
+              'Failed to delete address. Please try again.',
+            );
+          }
+        });
+    } else {
+      this.closeDeleteConfirmation();
+    }
+  }
+
   onEditCountrySelected(countryName: string): void {
     this.divisions = [];
     this.districts = [];
@@ -307,7 +343,8 @@ export class AllAddress implements OnInit {
 
     const clientId = Number(this.editAddressGroup.get('clientId')?.value);
     if (!Number.isFinite(clientId)) {
-      alert('Client ID is missing.');
+      this.alertVarient = 'error';
+      this.openSuccessModal('Client ID is missing.');
       return;
     }
 
@@ -341,13 +378,15 @@ export class AllAddress implements OnInit {
     this.clientService.updateClientAddress(clientId, payload).subscribe({
       next: () => {
         this.isSavingEdit = false;
-        alert('Address updated successfully.');
+        this.alertVarient = 'success';
+        this.openSuccessModal('Address updated successfully.');
         this.onEditModalClosed();
         this.loadClientAddresses();
       },
       error: () => {
         this.isSavingEdit = false;
-        this.editErrorMessage = 'Failed to update address.';
+        this.alertVarient = 'error';
+        this.openSuccessModal('Failed to update address. Please try again.');
       },
     });
   }
@@ -456,7 +495,8 @@ export class AllAddress implements OnInit {
         this.addressTypes = types;
       },
       error: () => {
-        this.editErrorMessage = 'Failed to load address types.';
+        this.alertVarient = 'error';
+        this.openSuccessModal('Failed to load address types.');
       },
     });
   }
@@ -467,7 +507,8 @@ export class AllAddress implements OnInit {
         this.countries = countries;
       },
       error: () => {
-        this.editErrorMessage = 'Failed to load countries.';
+        this.alertVarient = 'error';
+        this.openSuccessModal('Failed to load countries.');
       },
     });
   }
@@ -480,7 +521,8 @@ export class AllAddress implements OnInit {
           this.divisions = divisions;
         },
         error: () => {
-          this.editErrorMessage = 'Failed to load divisions.';
+          this.alertVarient = 'error';
+          this.openSuccessModal('Failed to load divisions.');
         },
       });
   }
@@ -493,7 +535,8 @@ export class AllAddress implements OnInit {
           this.districts = districts;
         },
         error: () => {
-          this.editErrorMessage = 'Failed to load districts.';
+          this.alertVarient = 'error';
+          this.openSuccessModal('Failed to load districts.');
         },
       });
   }
@@ -506,7 +549,8 @@ export class AllAddress implements OnInit {
           this.thanas = thanas;
         },
         error: () => {
-          this.editErrorMessage = 'Failed to load thanas.';
+          this.alertVarient = 'error';
+          this.openSuccessModal('Failed to load thanas.');
         },
       });
   }
@@ -677,5 +721,27 @@ export class AllAddress implements OnInit {
     }
     const match = list.find((item) => item[nameKey] === value);
     return match?.id ?? this.stringifyValue(value);
+  }
+
+  private openDeleteConfirmation(clientId: number): void {
+    this.pendingDeleteClientId = clientId;
+    this.deleteMessage.set(
+      `Are you sure you want to delete this address with client Id: ${clientId}?`,
+    );
+    this.isDeleteConfirmationOpen.set(true);
+  }
+
+  closeSuccessModal(): void {
+    this.isSuccessModalOpen.set(false);
+    this.successModalMessage.set('');
+  }
+
+  onSuccessModalButtonClick(event: { action: string }): void {
+    this.closeSuccessModal();
+  }
+
+  private openSuccessModal(message: string): void {
+    this.successModalMessage.set(message);
+    this.isSuccessModalOpen.set(true);
   }
 }

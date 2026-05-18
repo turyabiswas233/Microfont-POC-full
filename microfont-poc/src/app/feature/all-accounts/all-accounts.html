@@ -1,4 +1,19 @@
 <div>
+  <app-custom-alert
+    [isOpen]="isSuccessModalOpen()"
+    [title]="successModalTitle()"
+    [message]="successModalMessage()"
+    [variant]="'success'"
+    (close)="closeSuccessModal()"
+    (buttonClick)="onSuccessModalButtonClick($event)"
+  />
+  <confirmation-dialogue
+    [isOpen]="isDeleteConfirmationOpen()"
+    [title]="'Delete Account'"
+    [message]="deleteMessage()"
+    (close)="closeDeleteConfirmation()"
+    (buttonClick)="onDeleteConfirmationButtonClick($event)"
+  />
   <generic-data-grid
     [id]="'client-account-grid'"
     [dataSource]="clientAccounts"
@@ -37,9 +52,8 @@
             <h2>
               Client Information
               <hr />
-              <br />
             </h2>
-            <div class="from-grid form-grid-3-col gap-x-2">
+            <div class="from-grid form-grid-2-col gap-x-2">
               <input-text-box
                 [frmGroup]="accountDetailsGroup"
                 [label]="'Client ID'"
@@ -56,12 +70,12 @@
               />
             </div>
           </div>
+          <br />
 
           <div>
             <h2>
               Account Details
               <hr />
-              <br />
             </h2>
             <div class="from-grid form-grid-3-col gap-x-2">
               <input-text-box
@@ -147,10 +161,6 @@
         </div>
         <br />
         <app-client-accountinfo [group]="editAccountGroup" />
-
-        @if (editErrorMessage) {
-          <p class="text-sm text-red-500 mt-3">{{ editErrorMessage }}</p>
-        }
       </div>
       <br />
       <div class="flex justify-end gap-2">

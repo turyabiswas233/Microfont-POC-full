@@ -1,31 +1,31 @@
 package com.leads.sandbox.test.project.register.command;
 
 public class RegisterClient {
-    private SaveClientDetails saveClientDetails;
-    private SaveClientAddress saveClientAddress;
-    private SaveClientAccountInfo saveClientAccountInfo;
+    private UpdateClientDetails updateClientDetails;
+    private UpdateClientAddress updateClientAddress;
+    private UpdateClientAccountInfo updateClientAccountInfo;
 
-    public SaveClientDetails getRegisterClientDetails() {
-        return saveClientDetails;
+    public UpdateClientDetails getRegisterClientDetails() {
+        return updateClientDetails;
     }
 
-    public void setRegisterClientDetails(SaveClientDetails saveClientDetails) {
-        this.saveClientDetails = saveClientDetails;
+    public void setRegisterClientDetails(UpdateClientDetails updateClientDetails) {
+        this.updateClientDetails = updateClientDetails;
     }
 
-    public SaveClientAddress getRegisterClientAddress() {
-        return saveClientAddress;
+    public UpdateClientAddress getRegisterClientAddress() {
+        return updateClientAddress;
     }
 
-    public void setRegisterClientAddress(SaveClientAddress saveClientAddress) {
-        this.saveClientAddress = saveClientAddress;
+    public void setRegisterClientAddress(UpdateClientAddress updateClientAddress) {
+        this.updateClientAddress = updateClientAddress;
     }
 
-    public SaveClientAccountInfo getRegisterClientAccountInfo() {
-        return saveClientAccountInfo;
+    public UpdateClientAccountInfo getRegisterClientAccountInfo() {
+        return updateClientAccountInfo;
     }
 
-    public void setRegisterClientAccountInfo(SaveClientAccountInfo saveClientAccountInfo) {
-        this.saveClientAccountInfo = saveClientAccountInfo;
+    public void setRegisterClientAccountInfo(UpdateClientAccountInfo updateClientAccountInfo) {
+        this.updateClientAccountInfo = updateClientAccountInfo;
     }
 }

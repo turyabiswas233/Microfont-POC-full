@@ -2,7 +2,7 @@ package com.leads.sandbox.test.project.register.command;
 
 import java.util.Date;
 
-public class SaveClientDetails {
+public class UpdateClientDetails {
     private long clientId;
     private String clientName;
     private String fatherName;
@@ -11,7 +11,7 @@ public class SaveClientDetails {
     private String gender;
     private String maritalStatus;
     private String spouseName;
-    private Integer nidNumber;
+    private Long nidNumber;
 
     public long getClientId() {
         return clientId;
@@ -77,11 +77,11 @@ public class SaveClientDetails {
         this.spouseName = spouseName;
     }
 
-    public Integer getNidNumber() {
+    public Long getNidNumber() {
         return nidNumber;
     }
 
-    public void setNidNumber(Integer nidNumber) {
+    public void setNidNumber(Long nidNumber) {
         this.nidNumber = nidNumber;
     }
 }

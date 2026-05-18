@@ -9,7 +9,7 @@ public class RetrieveClientDetails {
     private String gender;
     private String maritalStatus;
     private String spouseName;
-    private Integer nidNumber;
+    private Long nidNumber;
 
     public String getFatherName() {
         return fatherName;
@@ -59,11 +59,11 @@ public class RetrieveClientDetails {
         this.spouseName = spouseName;
     }
 
-    public Integer getNidNumber() {
+    public Long getNidNumber() {
         return nidNumber;
     }
 
-    public void setNidNumber(Integer nidNumber) {
+    public void setNidNumber(Long nidNumber) {
         this.nidNumber = nidNumber;
     }
 }

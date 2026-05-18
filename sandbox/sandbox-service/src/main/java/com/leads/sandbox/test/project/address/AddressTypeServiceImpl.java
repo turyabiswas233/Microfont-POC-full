@@ -1,10 +1,8 @@
-package com.leads.sandbox.test.project.address.implService;
+package com.leads.sandbox.test.project.address;
 
 import com.leads.sandbox.test.project.address.query.RetrieveAddressType;
-import com.leads.sandbox.test.project.address.query.RetrieveCountry;
 import com.leads.sandbox.test.project.address.repository.AddressTypeEntity;
 import com.leads.sandbox.test.project.address.repository.AddressTypeRepository;
-import com.leads.sandbox.test.project.address.repository.CountryEntity;
 import com.leads.sandbox.test.project.address.service.AddressTypeService;
 import org.springframework.stereotype.Service;
 

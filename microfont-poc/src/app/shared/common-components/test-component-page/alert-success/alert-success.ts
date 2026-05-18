@@ -1,4 +1,11 @@
-import { Component, input, output, EventEmitter, Inject, Optional } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  EventEmitter,
+  Inject,
+  Optional,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -21,7 +28,7 @@ export interface SuccessModalButton {
 @Component({
   selector: 'app-alert-success',
   imports: [CommonModule],
-  templateUrl: './alert-success.html'
+  templateUrl: './alert-success.html',
 })
 export class AlertSuccessComponent {
   readonly isOpen = input<boolean>(false);
@@ -33,9 +40,16 @@ export class AlertSuccessComponent {
   readonly customClass = input<string>('');
 
   readonly close = output<void>();
-  readonly buttonClick = output<{ action: string; button: SuccessModalButton }>();
+  readonly buttonClick = output<{
+    action: string;
+    button: SuccessModalButton;
+  }>();
 
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) private dialogData: SuccessModalConfig | null) {}
+  constructor(
+    @Optional()
+    @Inject(MAT_DIALOG_DATA)
+    private dialogData: SuccessModalConfig | null,
+  ) {}
 
   get titleText(): string {
     return this.dialogData?.title || this.config().title || this.title();
@@ -46,15 +60,27 @@ export class AlertSuccessComponent {
   }
 
   get showClose(): boolean {
-    return this.dialogData?.showCloseButton ?? this.config().showCloseButton ?? this.showCloseButton();
+    return (
+      this.dialogData?.showCloseButton ??
+      this.config().showCloseButton ??
+      this.showCloseButton()
+    );
   }
 
   get showBackdropValue(): boolean {
-    return this.dialogData?.showBackdrop ?? this.config().showBackdrop ?? this.showBackdrop();
+    return (
+      this.dialogData?.showBackdrop ??
+      this.config().showBackdrop ??
+      this.showBackdrop()
+    );
   }
 
   get buttons(): SuccessModalButton[] {
-    return this.dialogData?.buttons || this.config().buttons || this.getDefaultButtons();
+    return (
+      this.dialogData?.buttons ||
+      this.config().buttons ||
+      this.getDefaultButtons()
+    );
   }
 
   getButtonClasses(button: SuccessModalButton, index: number): string {
@@ -62,15 +88,13 @@ export class AlertSuccessComponent {
     if (index === 0) {
       return 'border-transparent text-white bg-green-600 hover:bg-green-700 focus:ring-green-500';
     }
-    
+
     // Secondary button (second button) - gray border (like Cancel button)
     return 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-gray-500';
   }
 
   private getDefaultButtons(): SuccessModalButton[] {
-    return [
-      { text: 'OK', action: 'ok' }
-    ];
+    return [{ text: 'OK', action: 'ok' }];
   }
 
   onClose(): void {
@@ -88,4 +112,4 @@ export class AlertSuccessComponent {
       this.onClose();
     }
   }
-} 
+}

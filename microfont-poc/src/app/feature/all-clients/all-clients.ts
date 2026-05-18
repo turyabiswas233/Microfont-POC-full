@@ -13,6 +13,8 @@ import {
 } from './ClientGridRow';
 import { FormControl, FormGroup } from '@angular/forms';
 import { InputDate } from '../../shared/common-components/input-types/input-date/input-date';
+import { ConfirmationDialogue } from '../../shared/common-components/confirmation-dialogue/confirmation-dialogue';
+import { AlertVariant, CustomAlert } from '../custom-alert/custom-alert';
 
 @Component({
   selector: 'app-all-clients',
@@ -23,6 +25,8 @@ import { InputDate } from '../../shared/common-components/input-types/input-date
     ExpansionPanelHeader,
     InputTextBox,
     InputDate,
+    ConfirmationDialogue,
+    CustomAlert,
   ],
   templateUrl: './all-clients.html',
   styleUrl: './all-clients.scss',
@@ -32,6 +36,13 @@ export class AllClients implements OnInit {
   selectedClient: ClientGridRow | any = null;
   infoHeaderPanel: WritableSignal<boolean> = signal(false);
   personalDetailsGroup: FormGroup;
+  isSuccessModalOpen = signal(false);
+  successModalTitle = signal('Success!');
+  successModalMessage = signal('');
+  alertVarient: AlertVariant = 'success';
+  isDeleteConfirmationOpen = signal(false);
+  deleteMessage = signal('');
+  pendingDeleteRow: ClientGridRow | null = null;
   columns = Object.keys(
     CLIENT_GRID_FIELDS,
   ) as (keyof typeof CLIENT_GRID_FIELDS)[];
@@ -105,28 +116,7 @@ export class AllClients implements OnInit {
     if (!row) {
       return;
     }
-
-    const confirmed = confirm(
-      `Are you sure you want to delete client with ID ${row.clientId}: ${row.clientName}?`,
-    );
-    if (!confirmed) {
-      return;
-    }
-
-    this.clientService.deleteClient(row.clientId).subscribe({
-      next: (success) => {
-        if (success) {
-          this.loadClients();
-        } else {
-          console.error(
-            'Failed to delete client: Server returned failure response',
-          );
-        }
-      },
-      error: (error) => {
-        console.error('Failed to delete client', error);
-      },
-    });
+    this.openDeleteConfirmation(row);
   }
 
   handleModalView(event: string): void {
@@ -166,6 +156,58 @@ export class AllClients implements OnInit {
     localStorage.removeItem('selectedClientId');
   }
 
+  closeDeleteConfirmation(): void {
+    this.isDeleteConfirmationOpen.set(false);
+    this.deleteMessage.set('');
+    this.pendingDeleteRow = null;
+  }
+
+  closeSuccessModal(): void {
+    this.isSuccessModalOpen.set(false);
+    this.successModalMessage.set('');
+  }
+
+  onSuccessModalButtonClick(event: { action: string }): void {
+    this.closeSuccessModal();
+  }
+
+  private openSuccessModal(message: string): void {
+    this.successModalMessage.set(message);
+    this.isSuccessModalOpen.set(true);
+  }
+
+  onDeleteConfirmationButtonClick(event: {
+    action: string;
+    button: { action?: string };
+  }): void {
+    if (event.action === 'confirm') {
+      const row = this.pendingDeleteRow;
+      this.closeDeleteConfirmation();
+      if (!row) {
+        return;
+      }
+      this.clientService.deleteClient(row.clientId).subscribe({
+        next: (isDeleted) => {
+          const message = isDeleted
+            ? 'Client deleted successfully.'
+            : 'Failed to delete client.';
+
+          this.alertVarient = isDeleted ? 'success' : 'error';
+          this.openSuccessModal(message);
+
+          if (isDeleted) {
+            this.loadClients();
+          }
+        },
+        error: (error) => {
+          console.error('Failed to delete client', error);
+        },
+      });
+    } else {
+      this.closeDeleteConfirmation();
+    }
+  }
+
   handleDeleteRow(event: string): void {
     const row = this.parseGridEvent(event);
     if (!row) {
@@ -173,10 +215,12 @@ export class AllClients implements OnInit {
     }
 
     this.clientService.deleteClient(row.clientId).subscribe({
-      next: () => {
-        this.clients = this.clients.filter(
-          (item) => item.clientId !== row.clientId,
-        );
+      next: (deleteResponse) => {
+        if (deleteResponse) {
+          this.clients = this.clients.filter(
+            (item) => item.clientId !== row.clientId,
+          );
+        }
       },
       error: (error) => {
         console.error('Failed to delete client', error);
@@ -191,6 +235,14 @@ export class AllClients implements OnInit {
       console.error('Invalid grid row payload', error);
       return null;
     }
+  }
+
+  private openDeleteConfirmation(row: ClientGridRow): void {
+    this.pendingDeleteRow = row;
+    this.deleteMessage.set(
+      `Are you sure you want to delete client with ID ${row.clientId}: ${row.clientName}?`,
+    );
+    this.isDeleteConfirmationOpen.set(true);
   }
 
   public handleCreateNew(): void {

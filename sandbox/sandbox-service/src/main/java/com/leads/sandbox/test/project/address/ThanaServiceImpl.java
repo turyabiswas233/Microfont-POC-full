@@ -1,8 +1,6 @@
-package com.leads.sandbox.test.project.address.implService;
+package com.leads.sandbox.test.project.address;
 
-import com.leads.sandbox.test.project.address.query.RetrieveDivision;
 import com.leads.sandbox.test.project.address.query.RetrieveThana;
-import com.leads.sandbox.test.project.address.repository.DivisionEntity;
 import com.leads.sandbox.test.project.address.repository.ThanaEntity;
 import com.leads.sandbox.test.project.address.repository.ThanaRepository;
 import com.leads.sandbox.test.project.address.service.ThanaService;

@@ -1,6 +1,6 @@
 package com.leads.sandbox.test.project.register.command;
 
-public class SaveClientAddress {
+public class UpdateClientAddress {
     private String addressType;
 
     private String country;

@@ -3,7 +3,7 @@ package com.leads.sandbox.test.project.register.command;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class SaveClientAccountInfo {
+public class UpdateClientAccountInfo {
 
     private String accountNumber;
     private String accountTitle;

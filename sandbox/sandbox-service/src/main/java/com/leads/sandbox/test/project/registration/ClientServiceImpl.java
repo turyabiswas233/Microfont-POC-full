@@ -1,4 +1,4 @@
-package com.leads.sandbox.test.project.registration.implService;
+package com.leads.sandbox.test.project.registration;
 
 import com.leads.sandbox.test.project.register.command.*;
 import com.leads.sandbox.test.project.register.query.*;
@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.leads.sandbox.test.project.register.service.ClientService;
 
-import java.util.*;
+import java.sql.Timestamp;
+import java.util.Random;
 import java.util.function.Consumer;
 
 @Service
@@ -47,38 +48,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
 
-    @Override
-    public RetrieveClient retrieveClient(Long clientId) {
-        return mapToRetrieveClient(getClientOrThrow(clientId));
-    }
 
-    @Override
-    public List<RetrieveClient> retrieveAllClients() {
-        return clientInfoRepository.findAll()
-                .stream()
-                .map(this::mapToRetrieveClient)
-                .toList();
-    }
-
-    @Override
-    public List<RetrieveClientAddressList> retrieveClientsAddresses() {
-        return clientInfoRepository.findAll()
-                .stream()
-                .map(client -> {
-                    RetrieveClientAddressList dto = new RetrieveClientAddressList();
-
-                    RetrieveClientInfo info = new RetrieveClientInfo();
-                    BeanUtils.copyProperties(client, info);
-
-                    dto.setRetrieveClientInfo(info);
-                    dto.setRetrieveClientAddress(mapAddress(client));
-
-                    return dto;
-                }).filter(e ->
-                        e.getRetrieveClientAddress().getAddressType() != null
-                )
-                .toList();
-    }
 
     private RetrieveClient mapToRetrieveClient(ClientInfoEntity client) {
         RetrieveClient rc = new RetrieveClient();
@@ -120,29 +90,23 @@ public class ClientServiceImpl implements ClientService {
         return dto;
     }
 
-
     @Override
-    public RetrieveClientInfo registerClientId(RegisterClientId client) {
-        ClientInfoEntity entity = new ClientInfoEntity();
-        entity.setClientName(client.getClientName());
-
-        long id = Math.abs(new Random().nextLong() % 123456100);
-        entity.setClientId(id);
-
-        clientInfoRepository.save(entity);
-
-        RetrieveClientInfo dto = new RetrieveClientInfo();
-        BeanUtils.copyProperties(entity, dto);
-
-        return dto;
+    public RegisterClientId registerClientId(RegisterClientId client) {
+        ClientInfoEntity clientInfo = new ClientInfoEntity();
+        clientInfo.setClientName(client.getClientName());
+        Random random = new Random();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        clientInfo.setClientId(random.nextLong(12345) + timestamp.getNanos());
+        clientInfoRepository.save(clientInfo);
+        client.setClientId(clientInfo.getClientId());
+        return  client;
     }
-
     @Transactional
     @Override
     public boolean registerFullClient(Long clientId,
-                                      SaveClientDetails details,
-                                      SaveClientAddress address,
-                                      SaveClientAccountInfo account) {
+                                      UpdateClientDetails details,
+                                      UpdateClientAddress address,
+                                      UpdateClientAccountInfo account) {
 
         createOrUpdateAll(clientId, details, address, account);
         return true;
@@ -151,9 +115,9 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     @Override
     public RetrieveClient updateFullClient(Long clientId,
-                                           SaveClientDetails details,
-                                           SaveClientAddress address,
-                                           SaveClientAccountInfo account) {
+                                           UpdateClientDetails details,
+                                           UpdateClientAddress address,
+                                           UpdateClientAccountInfo account) {
 
         ClientInfoEntity client = getClientOrThrow(clientId);
 
@@ -162,28 +126,10 @@ public class ClientServiceImpl implements ClientService {
         return mapToRetrieveClient(client);
     }
 
-    @Override
-    public List<RetrieveClientAccountInfoList> retrieveClientsAccountInfoList() {
-        return clientInfoRepository.findAll()
-                .stream()
-                .map(client -> {
-                    RetrieveClientAccountInfoList dto = new RetrieveClientAccountInfoList();
-
-                    RetrieveClientInfo info = new RetrieveClientInfo();
-                    BeanUtils.copyProperties(client, info);
-
-                    dto.setRetrieveClientInfo(info);
-                    dto.setRetrieveClientAccountInfo(mapAccount(client));
-
-                    return dto;
-                }).filter(e -> e.getRetrieveClientAccountInfo().getAccountNumber() != null)
-                .toList();
-    }
-
     private void createOrUpdateAll(Long clientId,
-                                   SaveClientDetails details,
-                                   SaveClientAddress address,
-                                   SaveClientAccountInfo account) {
+                                   UpdateClientDetails details,
+                                   UpdateClientAddress address,
+                                   UpdateClientAccountInfo account) {
 
         ClientInfoEntity client = getClientOrThrow(clientId);
 
@@ -198,11 +144,8 @@ public class ClientServiceImpl implements ClientService {
     public boolean deleteFullClient(Long clientId) {
         return clientInfoRepository.findByClientId(clientId)
                 .map(client -> {
-                    Long id = client.getClientId();
-                    clientAccountInfoRepository.deleteByClientId(id);
-                    clientAddressRepository.deleteByClientId(id);
-                    clientDetailsRepository.deleteByClientId(id);
-                    clientInfoRepository.delete(client);
+                    Long id = client.getId();
+                    clientInfoRepository.deleteById(id);
                     return true;
                 })
                 .orElse(false);
@@ -219,10 +162,10 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public boolean saveClientAddress(Long clientId, SaveClientAddress saveClientAddress) {
+    public boolean updateClientAddress(Long clientId, UpdateClientAddress updateClientAddress) {
         ClientInfoEntity client = getClientOrThrow(clientId);
         try {
-            clientAddressRepository.save(buildAddress(client, saveClientAddress));
+            clientAddressRepository.save(buildAddress(client, updateClientAddress));
             return true;
         } catch (Exception e) {
             return false;
@@ -230,10 +173,10 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public boolean saveClientAccountInfo(Long clientId, SaveClientAccountInfo saveClientAccountInfo) {
+    public boolean updateClientAccountInfo(Long clientId, UpdateClientAccountInfo updateClientAccountInfo) {
         ClientInfoEntity client = getClientOrThrow(clientId);
         try {
-            clientAccountInfoRepository.save(buildAccount(client, saveClientAccountInfo));
+            clientAccountInfoRepository.save(buildAccount(client, updateClientAccountInfo));
             return true;
         } catch (Exception e) {
             return false;
@@ -241,7 +184,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
 
-    private ClientDetailsEntity buildDetails(ClientInfoEntity client, SaveClientDetails dto) {
+    private ClientDetailsEntity buildDetails(ClientInfoEntity client, UpdateClientDetails dto) {
         ClientDetailsEntity entity = clientDetailsRepository
                 .findByClientId(client.getClientId())
                 .orElse(new ClientDetailsEntity());
@@ -254,7 +197,7 @@ public class ClientServiceImpl implements ClientService {
         return entity;
     }
 
-    private ClientAddressEntity buildAddress(ClientInfoEntity client, SaveClientAddress dto) {
+    private ClientAddressEntity buildAddress(ClientInfoEntity client, UpdateClientAddress dto) {
         ClientAddressEntity entity = clientAddressRepository
                 .findByClientId(client.getClientId())
                 .orElse(new ClientAddressEntity());
@@ -267,7 +210,7 @@ public class ClientServiceImpl implements ClientService {
         return entity;
     }
 
-    private ClientAccountInfoEntity buildAccount(ClientInfoEntity client, SaveClientAccountInfo dto) {
+    private ClientAccountInfoEntity buildAccount(ClientInfoEntity client, UpdateClientAccountInfo dto) {
         ClientAccountInfoEntity entity = clientAccountInfoRepository
                 .findByClientId(client.getClientId())
                 .orElse(new ClientAccountInfoEntity());

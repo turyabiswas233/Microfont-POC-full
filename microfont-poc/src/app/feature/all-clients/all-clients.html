@@ -1,4 +1,19 @@
 <div>
+  <confirmation-dialogue
+    [isOpen]="isDeleteConfirmationOpen()"
+    [title]="'Delete Client'"
+    [message]="deleteMessage()"
+    (close)="closeDeleteConfirmation()"
+    (buttonClick)="onDeleteConfirmationButtonClick($event)"
+  />
+  <app-custom-alert
+    [isOpen]="isSuccessModalOpen()"
+    [title]="successModalTitle()"
+    [message]="successModalMessage()"
+    [variant]="alertVarient"
+    (close)="closeSuccessModal()"
+    (buttonClick)="onSuccessModalButtonClick($event)"
+  />
   <generic-button
     (click)="handleCreateNew()"
     [icon]="'add'"

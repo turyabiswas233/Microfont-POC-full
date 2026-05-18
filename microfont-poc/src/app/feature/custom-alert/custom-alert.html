@@ -1,0 +1,57 @@
+@if (isOpen()) {
+  @if (showBackdrop()) {
+    <div
+      class="fixed inset-0 bg-black opacity-60 backdrop-blur-sm z-40"
+      (click)="onBackdropClick($event)"
+    ></div>
+  }
+
+  <div
+    class="fixed inset-0 z-50 grid place-items-center p-4"
+    (click)="onBackdropClick($event)"
+  >
+    <div
+      class="bg-white rounded-xl shadow-2xl w-full max-w-md transition-all duration-200 ease-out border border-gray-100"
+    >
+      <div class="p-6 space-y-4">
+        <div
+          class="mx-auto flex items-center justify-center h-12 w-12 rounded-full border-2"
+          [ngClass]="iconContainerClass"
+        >
+          <svg
+            class="h-6 w-6"
+            [ngClass]="iconClass"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              [attr.d]="iconPath"
+            />
+          </svg>
+        </div>
+
+        <div class="text-center space-y-2">
+          <h3 class="text-lg text-gray-900 leading-6">{{ title() }}</h3>
+          @if (message()) {
+            <p class="text-sm text-gray-700">{{ message() }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="bg-none px-6 py-4 rounded-b-xl flex justify-end gap-3">
+        <button
+          type="button"
+          class="inline-flex justify-center rounded-full border px-6 py-2 text-sm font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer min-w-[80px]"
+          [ngClass]="buttonClass"
+          (click)="onButtonClick()"
+        >
+          {{ buttonText() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

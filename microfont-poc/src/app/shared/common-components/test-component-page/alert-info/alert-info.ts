@@ -1,4 +1,11 @@
-import { Component, input, output, EventEmitter, Inject, Optional } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  EventEmitter,
+  Inject,
+  Optional,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
@@ -18,10 +25,10 @@ export interface InfoModalButton {
 }
 
 @Component({
-    selector: 'app-alert-info',
-    imports: [CommonModule],
-    standalone: true,
-    templateUrl: './alert-info.html'
+  selector: 'app-alert-info',
+  imports: [CommonModule],
+  standalone: true,
+  templateUrl: './alert-info.html',
 })
 export class AlertInfoComponent {
   readonly isOpen = input<boolean>(false);
@@ -35,7 +42,11 @@ export class AlertInfoComponent {
   readonly close = output<void>();
   readonly buttonClick = output<{ action: string; button: InfoModalButton }>();
 
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) private dialogData: InfoModalConfig | null) {}
+  constructor(
+    @Optional()
+    @Inject(MAT_DIALOG_DATA)
+    private dialogData: InfoModalConfig | null,
+  ) {}
 
   get titleText(): string {
     return this.dialogData?.title || this.config().title || this.title();
@@ -46,15 +57,27 @@ export class AlertInfoComponent {
   }
 
   get showClose(): boolean {
-    return this.dialogData?.showCloseButton ?? this.config().showCloseButton ?? this.showCloseButton();
+    return (
+      this.dialogData?.showCloseButton ??
+      this.config().showCloseButton ??
+      this.showCloseButton()
+    );
   }
 
   get showBackdropValue(): boolean {
-    return this.dialogData?.showBackdrop ?? this.config().showBackdrop ?? this.showBackdrop();
+    return (
+      this.dialogData?.showBackdrop ??
+      this.config().showBackdrop ??
+      this.showBackdrop()
+    );
   }
 
   get buttons(): InfoModalButton[] {
-    return this.dialogData?.buttons || this.config().buttons || this.getDefaultButtons();
+    return (
+      this.dialogData?.buttons ||
+      this.config().buttons ||
+      this.getDefaultButtons()
+    );
   }
 
   getButtonClasses(button: InfoModalButton, index: number): string {
@@ -68,9 +91,7 @@ export class AlertInfoComponent {
   }
 
   private getDefaultButtons(): InfoModalButton[] {
-    return [
-      { text: 'Close', action: 'ok' }
-    ];
+    return [{ text: 'Close', action: 'ok' }];
   }
 
   onClose(): void {

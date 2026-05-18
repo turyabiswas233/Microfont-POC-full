@@ -1,9 +1,16 @@
-import { Component, effect, inject, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  signal,
+  SimpleChanges,
+} from '@angular/core';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { ClientInfo } from '../client-info/client-info';
 import { ClientDetails } from '../client-details/client-details';
 import { ClientAddress } from '../client-address/client-address';
 import { ClientAccountinfo } from '../client-accountinfo/client-accountinfo';
+import { CustomAlert } from '../custom-alert/custom-alert';
 import {
   FormBuilder,
   FormGroup,
@@ -31,6 +38,7 @@ import { Router } from '@angular/router';
     ClientDetails,
     ClientAddress,
     ClientAccountinfo,
+    CustomAlert,
     ReactiveFormsModule,
   ],
   templateUrl: './client-registration.html',
@@ -107,6 +115,10 @@ export class ClientRegistration {
   isSaving = false;
   errorMessage: string | null = null;
   mode: 'edit' | 'create' = 'create';
+  isSuccessModalOpen = signal(false);
+  successModalTitle = signal('Success!');
+  successModalMessage = signal('');
+  successAction: 'create' | 'update' | null = null;
 
   get clientInfoForm(): FormGroup {
     return this.clientForm.get('clientInfo') as FormGroup;
@@ -496,13 +508,7 @@ export class ClientRegistration {
     };
 
     if (this.clientId) {
-      try {
-        this.createClient(payload);
-        this.router.navigate(['/allclients']);
-      } catch (error) {
-        console.error('Error creating client:', error);
-        this.errorMessage = 'An error occurred while creating the client.';
-      }
+      this.createClient(payload);
     }
   }
 
@@ -557,13 +563,7 @@ export class ClientRegistration {
       registerClientAccountInfo: this.accountInfoForm.value,
     };
 
-    try {
-      this.updateClient(payload);
-      this.router.navigate(['/allclients']);
-    } catch (error) {
-      console.error('Error updating client:', error);
-      this.errorMessage = 'An error occurred while updating the client.';
-    }
+    this.updateClient(payload);
   }
 
   resetForm(): void {
@@ -586,6 +586,10 @@ export class ClientRegistration {
         this.isSaving = false;
         this.clientId = client.id;
         this.errorMessage = null;
+        this.openSuccessModal(
+          'Client registration completed successfully.',
+          'create',
+        );
       },
       error: () => {
         this.isSaving = false;
@@ -601,12 +605,34 @@ export class ClientRegistration {
         this.isSaving = false;
         this.clientId = client.id;
         this.errorMessage = null;
+        this.openSuccessModal('Client updated successfully.', 'update');
       },
       error: () => {
         this.isSaving = false;
         this.errorMessage = 'Failed to update client.';
       },
     });
+  }
+
+  closeSuccessModal(): void {
+    this.isSuccessModalOpen.set(false);
+    this.successModalMessage.set('');
+  }
+
+  onSuccessModalButtonClick(): void {
+    const action = this.successAction;
+    this.successAction = null;
+    this.closeSuccessModal();
+
+    if (action) {
+      this.router.navigate(['/allclients']);
+    }
+  }
+
+  private openSuccessModal(message: string, action: 'create' | 'update'): void {
+    this.successAction = action;
+    this.successModalMessage.set(message);
+    this.isSuccessModalOpen.set(true);
   }
 
   onGenIdClick(): void {

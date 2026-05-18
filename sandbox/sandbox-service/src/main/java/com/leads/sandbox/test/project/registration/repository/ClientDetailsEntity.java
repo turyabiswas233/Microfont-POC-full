@@ -34,7 +34,7 @@ public class ClientDetailsEntity {
     private String maritalStatus;
     private String spouseName;
     @NotNull
-    private Integer nidNumber;
+    private Long nidNumber;
 
     @Column
     @UpdateTimestamp
@@ -117,11 +117,11 @@ public class ClientDetailsEntity {
         this.spouseName = spouseName;
     }
 
-    public Integer getNidNumber() {
+    public Long getNidNumber() {
         return nidNumber;
     }
 
-    public void setNidNumber(Integer nidNumber) {
+    public void setNidNumber(Long nidNumber) {
         this.nidNumber = nidNumber;
     }
 

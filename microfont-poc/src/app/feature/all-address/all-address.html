@@ -1,4 +1,19 @@
 <div>
+  <app-custom-alert
+    [isOpen]="isSuccessModalOpen()"
+    [title]="successModalTitle()"
+    [message]="successModalMessage()"
+    [variant]="alertVarient"
+    (close)="closeSuccessModal()"
+    (buttonClick)="onSuccessModalButtonClick($event)"
+  />
+  <confirmation-dialogue
+    [isOpen]="isDeleteConfirmationOpen()"
+    [title]="'Delete Address'"
+    [message]="deleteMessage()"
+    (close)="closeDeleteConfirmation()"
+    (buttonClick)="onDeleteConfirmationButtonClick($event)"
+  />
   <generic-data-grid
     [id]="'client-address-grid'"
     [dataSource]="clientAddresses"
@@ -113,12 +128,13 @@
                 [ariaDisabled]="true"
                 [isReadonly]="true"
               />
-              <input-text-box
+              <input-text-area
                 [frmGroup]="addressDetailsGroup"
+                class="col-span-2"
                 [label]="'Address'"
                 [controlName]="'address'"
                 [ariaDisabled]="true"
-                [isReadonly]="true"
+                [rows]="2"
               />
             </div>
           </div>
@@ -195,10 +211,6 @@
           (divisionSelected)="onEditDivisionSelected($event)"
           (districtSelected)="onEditDistrictSelected($event)"
         />
-
-        @if (editErrorMessage) {
-          <p class="text-sm text-red-500 mt-3">{{ editErrorMessage }}</p>
-        }
       </div>
       <br />
       <div class="flex justify-end gap-2">

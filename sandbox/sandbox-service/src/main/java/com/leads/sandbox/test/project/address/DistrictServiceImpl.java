@@ -1,10 +1,8 @@
-package com.leads.sandbox.test.project.address.implService;
+package com.leads.sandbox.test.project.address;
 
 import com.leads.sandbox.test.project.address.query.RetrieveDistrict;
-import com.leads.sandbox.test.project.address.query.RetrieveDivision;
 import com.leads.sandbox.test.project.address.repository.DistrictEntity;
 import com.leads.sandbox.test.project.address.repository.DistrictRepository;
-import com.leads.sandbox.test.project.address.repository.DivisionEntity;
 import com.leads.sandbox.test.project.address.service.DistrictService;
 import org.springframework.stereotype.Service;
 

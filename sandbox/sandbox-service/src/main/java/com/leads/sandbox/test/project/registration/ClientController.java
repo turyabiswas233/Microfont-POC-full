@@ -2,15 +2,14 @@ package com.leads.sandbox.test.project.registration;
 
 import com.leads.sandbox.test.project.register.command.RegisterClient;
 import com.leads.sandbox.test.project.register.command.RegisterClientId;
-import com.leads.sandbox.test.project.register.command.SaveClientAccountInfo;
-import com.leads.sandbox.test.project.register.command.SaveClientAddress;
+import com.leads.sandbox.test.project.register.command.UpdateClientAccountInfo;
+import com.leads.sandbox.test.project.register.command.UpdateClientAddress;
 import com.leads.sandbox.test.project.register.query.RetrieveClient;
 import com.leads.sandbox.test.project.register.query.RetrieveClientAccountInfoList;
 import com.leads.sandbox.test.project.register.query.RetrieveClientAddressList;
-import com.leads.sandbox.test.project.register.query.RetrieveClientInfo;
 import com.leads.sandbox.test.project.register.service.ClientService;
-import com.leads.sandbox.test.project.registration.implService.ClientServiceImpl;
 
+import com.leads.sandbox.test.project.register.service.ClientQueryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,15 +26,17 @@ import java.util.List;
                 RequestMethod.POST, RequestMethod.GET, RequestMethod.DELETE, RequestMethod.PUT,
         }
 )
-public class ClientInfoController {
+public class ClientController {
     private final ClientService clientService;
+    private final ClientQueryService clientQueryService;
 
-    public ClientInfoController(ClientServiceImpl clientService) {
-        this.clientService = clientService;
+    public ClientController(ClientServiceImpl clientCommandService, ClientQueryService clientQueryService) {
+        this.clientService = clientCommandService;
+        this.clientQueryService = clientQueryService;
     }
 
     @PostMapping("/genid")
-    public ResponseEntity<RetrieveClientInfo> generateClientId(@RequestBody @Valid RegisterClientId registerClientId) {
+    public ResponseEntity<RegisterClientId> generateClientId(@RequestBody @Valid RegisterClientId registerClientId) {
         return ResponseEntity.ok(clientService.registerClientId(registerClientId));
     }
 
@@ -46,19 +47,19 @@ public class ClientInfoController {
     }
 
     @PostMapping("/{clientId}/address")
-    public ResponseEntity<Boolean> saveClientAddress(@PathVariable Long clientId, @RequestBody @Valid SaveClientAddress request) {
-        boolean isSavedClientAddress = clientService.saveClientAddress(clientId, request);
+    public ResponseEntity<Boolean> saveClientAddress(@PathVariable Long clientId, @RequestBody @Valid UpdateClientAddress request) {
+        boolean isSavedClientAddress = clientService.updateClientAddress(clientId, request);
         return ResponseEntity.ok(isSavedClientAddress);
     }
     @PostMapping("/{clientId}/account")
-    public ResponseEntity<Boolean> saveClientAccountInfo(@PathVariable Long clientId, @RequestBody @Valid SaveClientAccountInfo request) {
-        boolean isSavedClientAddress = clientService.saveClientAccountInfo(clientId, request);
+    public ResponseEntity<Boolean> saveClientAccountInfo(@PathVariable Long clientId, @RequestBody @Valid UpdateClientAccountInfo request) {
+        boolean isSavedClientAddress = clientService.updateClientAccountInfo(clientId, request);
         return ResponseEntity.ok(isSavedClientAddress);
     }
 
     @GetMapping
     public ResponseEntity<List<RetrieveClient>> retrieveAllClientsList() {
-        return ResponseEntity.ok(clientService.retrieveAllClients());
+        return ResponseEntity.ok(clientQueryService.retrieveAllClients());
     }
 
 
@@ -70,19 +71,19 @@ public class ClientInfoController {
 
     @GetMapping("/{clientId}")
     public ResponseEntity<RetrieveClient> getClient(@PathVariable Long clientId) {
-        RetrieveClient client = clientService.retrieveClient(clientId);
+        RetrieveClient client = clientQueryService.retrieveClient(clientId);
         return ResponseEntity.ok(client);
     }
 
     @GetMapping("/address")
     public ResponseEntity<List<RetrieveClientAddressList>> getClientAddressList() {
-        List<RetrieveClientAddressList> retrieveClientAddressLists = clientService.retrieveClientsAddresses();
+        List<RetrieveClientAddressList> retrieveClientAddressLists = clientQueryService.retrieveClientsAddresses();
         return ResponseEntity.ok(retrieveClientAddressLists);
     }
 
     @GetMapping("/account")
     public ResponseEntity<List<RetrieveClientAccountInfoList>> getClientAddress() {
-        List<RetrieveClientAccountInfoList> retrieveClientAccountInfoList = clientService.retrieveClientsAccountInfoList();
+        List<RetrieveClientAccountInfoList> retrieveClientAccountInfoList = clientQueryService.retrieveClientsAccountInfoList();
         return ResponseEntity.ok(retrieveClientAccountInfoList);
     }
 
