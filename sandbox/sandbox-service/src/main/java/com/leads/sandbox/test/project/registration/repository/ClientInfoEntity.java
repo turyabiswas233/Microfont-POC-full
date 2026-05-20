@@ -3,6 +3,7 @@ package com.leads.sandbox.test.project.registration.repository;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
@@ -10,14 +11,10 @@ import java.time.LocalDateTime;
 @Table(name = "client_info_turya")
 public class ClientInfoEntity {
 
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column
     private String clientName;
 
+    @Id
     @Column(name = "client_id", unique = true, nullable = false)
     private Long clientId;
 
@@ -49,16 +46,6 @@ public class ClientInfoEntity {
             cascade = CascadeType.ALL
     )
     private ClientAccountInfoEntity clientAccountInfoEntity;
-
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getClientName() {
         return clientName;
@@ -97,22 +84,22 @@ public class ClientInfoEntity {
     }
 
     public void setClientDetailsEntity(ClientDetailsEntity clientDetailsEntity) {
-        this.clientDetailsEntity = this.clientDetailsEntity;
+        this.clientDetailsEntity = clientDetailsEntity;
     }
 
-    public ClientAddressEntity getClientAddress() {
+    public ClientAddressEntity getClientAddressEntity() {
         return clientAddressEntity;
     }
 
-    public void setClientAddress(ClientAddressEntity clientAddressEntity) {
+    public void setClientAddressEntity(ClientAddressEntity clientAddressEntity) {
         this.clientAddressEntity = clientAddressEntity;
     }
 
-    public ClientAccountInfoEntity getClientAccountInfo() {
+    public ClientAccountInfoEntity getClientAccountInfoEntity() {
         return clientAccountInfoEntity;
     }
 
-    public void setClientAccountInfo(ClientAccountInfoEntity clientAccountInfoEntity) {
+    public void setClientAccountInfoEntity(ClientAccountInfoEntity clientAccountInfoEntity) {
         this.clientAccountInfoEntity = clientAccountInfoEntity;
     }
 }

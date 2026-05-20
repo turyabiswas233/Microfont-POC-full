@@ -1,6 +1,5 @@
 package com.leads.sandbox.test.project.registration;
 
-import com.leads.sandbox.test.project.register.command.RegisterClientId;
 import com.leads.sandbox.test.project.register.query.*;
 import com.leads.sandbox.test.project.register.service.ClientQueryService;
 import com.leads.sandbox.test.project.registration.repository.*;

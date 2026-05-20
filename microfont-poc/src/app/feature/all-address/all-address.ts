@@ -403,18 +403,21 @@ export class AllAddress implements OnInit {
   private resolveLocationNames(
     address: AddressGridRow['retrieveClientAddress'],
   ): void {
+    const addressType$ = this.resolveAddressTypeValue(address.addressType);
     const country$ = this.resolveCountryName(address.country);
     const division$ = this.resolveDivisionName(address.division);
     const district$ = this.resolveDistrictName(address.district);
     const thana$ = this.resolveThanaName(address.thana);
 
     forkJoin({
+      addressType: addressType$,
       country: country$,
       division: division$,
       district: district$,
       thana: thana$,
     }).subscribe((resolved) => {
       this.addressDetailsGroup.patchValue({
+        addressType: resolved.addressType,
         country: resolved.country,
         division: resolved.division,
         district: resolved.district,

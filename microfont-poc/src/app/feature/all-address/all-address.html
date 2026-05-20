@@ -54,7 +54,7 @@
               <hr />
               <br />
             </h2>
-            <div class="from-grid form-grid-3-col gap-x-2">
+            <div class="from-grid form-grid-2-col gap-x-2">
               <input-text-box
                 [frmGroup]="addressDetailsGroup"
                 [label]="'Client ID'"
@@ -145,7 +145,7 @@
               <hr />
               <br />
             </h2>
-            <div class="from-grid form-grid-3-col gap-x-2">
+            <div class="from-grid form-grid-2-col gap-x-2">
               <input-text-box
                 [frmGroup]="addressDetailsGroup"
                 [label]="'Mobile No'"
@@ -174,7 +174,7 @@
     [isVisible]="this.editAddressRow != null"
   >
     <div class="modal-dialog">
-      <div class="max-h-[70vh]">
+      <div class="max-h-[60vh]">
         <div class="panel define-groups-shell">
           <section class="define-groups-header">
             <app-expansion-panel-header
@@ -182,7 +182,7 @@
               [panelTitle]="'Edit Address Information'"
             />
           </section>
-          <div class="from-grid form-grid-3-col gap-x-2">
+          <div class="from-grid form-grid-2-col gap-x-2">
             <input-text-box
               [frmGroup]="editAddressGroup"
               [label]="'Client ID'"
@@ -211,20 +211,20 @@
           (divisionSelected)="onEditDivisionSelected($event)"
           (districtSelected)="onEditDistrictSelected($event)"
         />
-      </div>
-      <br />
-      <div class="flex justify-end gap-2">
-        <generic-button
-          [label]="'Cancel'"
-          [cssClass]="'bg-slate-200 text-slate-700 hover:opacity-90'"
-          (onClick)="onEditModalClosed()"
-        />
-        <generic-button
-          [label]="isSavingEdit ? 'Saving...' : 'Save'"
-          [enable]="!isSavingEdit"
-          [cssClass]="'bg-blue-600 text-white hover:opacity-90'"
-          (onClick)="saveEdit()"
-        />
+        <br />
+        <div class="flex justify-end gap-2">
+          <generic-button
+            [label]="'Cancel'"
+            [cssClass]="'bg-slate-200 text-slate-700 hover:opacity-90'"
+            (onClick)="onEditModalClosed()"
+          />
+          <generic-button
+            [label]="isSavingEdit ? 'Saving...' : 'Save'"
+            [enable]="!isSavingEdit"
+            [cssClass]="'bg-blue-600 text-white hover:opacity-90'"
+            (onClick)="saveEdit()"
+          />
+        </div>
       </div>
     </div>
   </generic-modal>

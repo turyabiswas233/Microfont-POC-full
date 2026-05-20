@@ -13,9 +13,4 @@ import java.util.Optional;
 public interface ClientAddressRepo extends JpaRepository<ClientAddressEntity, Long> {
     Optional<ClientAddressEntity> findByClientId(Long clientId);
 
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM ClientAddressEntity c WHERE c.clientId = :clientId")
-    void deleteByClientId(@Param("clientId") Long clientId);
-
 }

@@ -5,7 +5,8 @@ import {
   signal,
   SimpleChanges,
 } from '@angular/core';
-import { Subscription, firstValueFrom } from 'rxjs';
+import { Subscription, firstValueFrom, forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { ClientInfo } from '../client-info/client-info';
 import { ClientDetails } from '../client-details/client-details';
 import { ClientAddress } from '../client-address/client-address';
@@ -168,7 +169,7 @@ export class ClientRegistration {
     this.clientId = clientIdParam ? parseInt(clientIdParam) : -1;
 
     if (this.clientId && this.mode === 'edit') {
-      this.loadClient(this.clientId);
+      void this.loadClient(this.clientId);
     } else {
       // do nothing
       this.loadAddressTypes();
@@ -312,162 +313,228 @@ export class ClientRegistration {
     this.clientForm.reset();
   }
 
-  loadClient(id: number): void {
-    this.clientService.getClientById(id).subscribe({
-      next: (client) => {
-        this.clientId = client.id;
-        const address = client.retrieveClientAddress;
-        this.clientInfoForm.patchValue({
-          clientName: client.retrieveClientInfo.clientName,
-          clientId: client.retrieveClientInfo.clientId,
-        });
+  async loadClient(id: number): Promise<void> {
+    try {
+      const client = await firstValueFrom(this.clientService.getClientById(id));
+      this.clientId = client.id;
+      const address = client.retrieveClientAddress;
+      const resolvedLocationNames = await firstValueFrom(
+        this.resolveLocationNames(address),
+      );
 
-        this.clientDetailsForm.patchValue({
-          fatherName: client.retrieveClientDetails.fatherName,
-          motherName: client.retrieveClientDetails.motherName,
-          dateOfBirth: client.retrieveClientDetails.dateOfBirth,
-          spouseName: client.retrieveClientDetails.spouseName,
-          gender: client.retrieveClientDetails.gender,
-          maritalStatus: client.retrieveClientDetails.maritalStatus,
-          nidNumber: client.retrieveClientDetails.nidNumber,
-        });
+      this.clientInfoForm.patchValue({
+        clientName: client.retrieveClientInfo.clientName,
+        clientId: client.retrieveClientInfo.clientId,
+      });
 
-        this.clientAddressForm.patchValue({
-          addressType: address.addressType,
-          country: address.country,
-          division: address.division,
-          district: address.district,
-          thana: address.thana,
-          zipCode: address.zipCode,
-          city: address.city,
-          mobileNumber: address.mobileNumber,
-          email: address.email,
-          address: address.address,
-        });
+      this.clientDetailsForm.patchValue({
+        fatherName: client.retrieveClientDetails.fatherName,
+        motherName: client.retrieveClientDetails.motherName,
+        dateOfBirth: client.retrieveClientDetails.dateOfBirth,
+        spouseName: client.retrieveClientDetails.spouseName,
+        gender: client.retrieveClientDetails.gender,
+        maritalStatus: client.retrieveClientDetails.maritalStatus,
+        nidNumber: client.retrieveClientDetails.nidNumber,
+      });
 
-        this.accountInfoForm.patchValue({
-          officeCode: client.retrieveClientAccountInfo.officeCode,
-          accountNumber: client.retrieveClientAccountInfo.accountNumber,
-          accountTitle: client.retrieveClientAccountInfo.accountTitle,
-          accountOpenDate: client.retrieveClientAccountInfo.accountOpenDate,
-          accountExpiryDate: client.retrieveClientAccountInfo.accountExpiryDate,
-          limitAmount: client.retrieveClientAccountInfo.limitAmount,
-        });
-        this.loadAddressLookups(address);
+      this.clientAddressForm.patchValue({
+        addressType: resolvedLocationNames.addressType,
+        country: resolvedLocationNames.country,
+        division: resolvedLocationNames.division,
+        district: resolvedLocationNames.district,
+        thana: resolvedLocationNames.thana,
+        zipCode: address.zipCode,
+        city: address.city,
+        mobileNumber: address.mobileNumber,
+        email: address.email,
+        address: address.address,
+      });
 
-        this.syncDependentFormsState();
+      this.accountInfoForm.patchValue({
+        officeCode: client.retrieveClientAccountInfo.officeCode,
+        accountNumber: client.retrieveClientAccountInfo.accountNumber,
+        accountTitle: client.retrieveClientAccountInfo.accountTitle,
+        accountOpenDate: client.retrieveClientAccountInfo.accountOpenDate,
+        accountExpiryDate: client.retrieveClientAccountInfo.accountExpiryDate,
+        limitAmount: client.retrieveClientAccountInfo.limitAmount,
+      });
 
-        this.errorMessage = null;
-      },
-      error: () => {
-        this.errorMessage = 'Failed to load client.';
-      },
-      complete: () => {
-        this.syncDependentFormsState();
-      },
+      await this.loadAddressOptionLists(resolvedLocationNames);
+
+      this.syncDependentFormsState();
+      this.errorMessage = null;
+    } catch {
+      this.errorMessage = 'Failed to load client.';
+    }
+  }
+
+  private resolveLocationNames(address: {
+    addressType: string | number;
+    country: string | number;
+    division: string | number;
+    district: string | number;
+    thana: string | number;
+  }) {
+    const addressType$ = this.resolveAddressTypeValue(address.addressType);
+    const country$ = this.resolveCountryValue(address.country);
+    const division$ = this.resolveDivisionValue(address.division);
+    const district$ = this.resolveDistrictValue(address.district);
+    const thana$ = this.resolveThanaValue(address.thana);
+
+    return forkJoin({
+      addressType: addressType$,
+      country: country$,
+      division: division$,
+      district: district$,
+      thana: thana$,
     });
   }
 
-  private async loadAddressLookups(address: {
-    addressType: number;
-    country: number;
-    division: number;
-    district: number;
-    thana: number;
+  private async loadAddressOptionLists(address: {
+    country: string;
+    division: string;
+    district: string;
   }): Promise<void> {
     this.divisions = [];
     this.districts = [];
     this.thanas = [];
 
-    const errorMessages: Record<string, string> = {
-      addressTypes: 'Failed to load address types.',
-      addressType: 'Failed to load address type.',
-      countries: 'Failed to load countries.',
-      country: 'Failed to load country.',
-      divisions: 'Failed to load divisions.',
-      division: 'Failed to load division.',
-      districts: 'Failed to load districts.',
-      district: 'Failed to load district.',
-      thanas: 'Failed to load thanas.',
-      thana: 'Failed to load thana.',
-    };
-
-    let step = 'addressTypes';
-
     try {
-      this.addressTypes = await firstValueFrom(this.addressService.getTypes());
-
-      step = 'addressType';
-      if (this.addressTypes.some((at) => at.id === address.addressType)) {
-        const addressType = await firstValueFrom(
-          this.addressService.getAddressType(address.addressType),
+      if (!this.addressTypes.length) {
+        this.addressTypes = await firstValueFrom(
+          this.addressService.getTypes(),
         );
-        this.clientAddressForm
-          .get('addressType')
-          ?.setValue(addressType.addressTypeName);
       }
 
-      step = 'countries';
-
-      this.countries = await firstValueFrom(this.addressService.getCountries());
-      if (this.countries.some((c) => c.id === address.country)) {
-        step = 'country';
-        const country = await firstValueFrom(
-          this.addressService.getCountry(address.country),
+      if (!this.countries.length) {
+        this.countries = await firstValueFrom(
+          this.addressService.getCountries(),
         );
-        this.clientAddressForm.get('country')?.setValue(country.countryName);
+      }
 
-        step = 'divisions';
+      if (address.country) {
         this.divisions = await firstValueFrom(
           this.addressService.getDivisionsByCountry(
             this.countries,
-            country.countryName,
+            address.country,
           ),
         );
-        if (this.divisions.some((d) => d.id === address.division)) {
-          step = 'division';
-          const division = await firstValueFrom(
-            this.addressService.getDivision(address.division),
-          );
-          this.clientAddressForm
-            .get('division')
-            ?.setValue(division.divisionName);
-
-          step = 'districts';
-          this.districts = await firstValueFrom(
-            this.addressService.getDistrictsByDivision(
-              this.divisions,
-              division.divisionName,
-            ),
-          );
-
-          if (this.districts.some((d) => d.id === address.district)) {
-            step = 'district';
-            const district = await firstValueFrom(
-              this.addressService.getDistrict(address.district),
-            );
-            this.clientAddressForm
-              .get('district')
-              ?.setValue(district.districtName);
-
-            step = 'thanas';
-            this.thanas = await firstValueFrom(
-              this.addressService.getThanasByDistrict(
-                this.districts,
-                district.districtName,
-              ),
-            );
-          }
-        }
       }
-      step = 'thana';
-      const thana = await firstValueFrom(
-        this.addressService.getThana(address.thana),
-      );
-      this.clientAddressForm.get('thana')?.setValue(thana.thanaName);
+
+      if (address.division) {
+        this.districts = await firstValueFrom(
+          this.addressService.getDistrictsByDivision(
+            this.divisions,
+            address.division,
+          ),
+        );
+      }
+
+      if (address.district) {
+        this.thanas = await firstValueFrom(
+          this.addressService.getThanasByDistrict(
+            this.districts,
+            address.district,
+          ),
+        );
+      }
     } catch {
-      this.errorMessage = errorMessages[step] ?? 'Failed to load address data.';
+      this.errorMessage = 'Failed to load address data.';
     }
+  }
+
+  private async resolveAddressTypeValue(
+    value: string | number,
+  ): Promise<string> {
+    const fallback = this.stringifyValue(value);
+    const id = this.toNumericId(value);
+    if (id === null) {
+      return fallback;
+    }
+    try {
+      const type = await firstValueFrom(this.addressService.getAddressType(id));
+      return type?.addressTypeName ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private async resolveCountryValue(value: string | number): Promise<string> {
+    const fallback = this.stringifyValue(value);
+    const id = this.toNumericId(value);
+    if (id === null) {
+      return fallback;
+    }
+    try {
+      const country = await firstValueFrom(this.addressService.getCountry(id));
+      return country?.countryName ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private async resolveDivisionValue(value: string | number): Promise<string> {
+    const fallback = this.stringifyValue(value);
+    const id = this.toNumericId(value);
+    if (id === null) {
+      return fallback;
+    }
+    try {
+      const division = await firstValueFrom(
+        this.addressService.getDivision(id),
+      );
+      return division?.divisionName ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private async resolveDistrictValue(value: string | number): Promise<string> {
+    const fallback = this.stringifyValue(value);
+    const id = this.toNumericId(value);
+    if (id === null) {
+      return fallback;
+    }
+    try {
+      const district = await firstValueFrom(
+        this.addressService.getDistrict(id),
+      );
+      return district?.districtName ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private async resolveThanaValue(value: string | number): Promise<string> {
+    const fallback = this.stringifyValue(value);
+    const id = this.toNumericId(value);
+    if (id === null) {
+      return fallback;
+    }
+    try {
+      const thana = await firstValueFrom(this.addressService.getThana(id));
+      return thana?.thanaName ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private toNumericId(value: string | number): number | null {
+    if (value === null || value === undefined) {
+      return null;
+    }
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return null;
+    }
+    return numeric;
+  }
+
+  private stringifyValue(value: string | number): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    return String(value);
   }
 
   onSubmit(): void {

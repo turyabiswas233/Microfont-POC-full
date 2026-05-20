@@ -1,6 +1,5 @@
 package com.leads.sandbox.test.project.registration.repository;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,13 +12,10 @@ import java.util.Date;
 @Table(name = "client_details_turya")
 public class ClientDetailsEntity {
 
+
     @Id
-    @Column(unique = true)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-
-    @Column(name = "client_id", unique = true, nullable = false)
+    @NotNull
+    @Column(name = "client_id", unique = true)
     private Long clientId;
 
     @NotNull
@@ -47,19 +43,12 @@ public class ClientDetailsEntity {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-            name = "client_info_id",
-            nullable = false,
-            unique = true
+            name = "client_id",
+            referencedColumnName = "client_id",
+            updatable = false,
+            insertable = false
     )
     private ClientInfoEntity clientInfoEntity;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getClientId() {
         return clientId;

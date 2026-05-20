@@ -1,6 +1,7 @@
 package com.leads.sandbox.test.project.registration.repository;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,13 +14,9 @@ import java.time.LocalDateTime;
 public class ClientAccountInfoEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-
-    @Column(name = "client_id", unique = true, nullable = false)
+    @NotNull
+    @Column(name = "client_id", unique = true)
     private Long clientId;
-
 
     @Column(nullable = false)
     private String officeCode;
@@ -48,19 +45,13 @@ public class ClientAccountInfoEntity {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-            name = "client_info_id",   // ✅ separate FK column
-            nullable = false,
-            unique = true
+            name = "client_id",
+            referencedColumnName = "client_id",
+            updatable = false,
+            insertable = false
     )
     private ClientInfoEntity clientInfoEntity;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getClientId() {
         return clientId;

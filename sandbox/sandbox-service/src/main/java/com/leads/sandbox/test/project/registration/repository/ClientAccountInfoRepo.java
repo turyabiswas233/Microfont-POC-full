@@ -12,10 +12,4 @@ import java.util.Optional;
 @Repository
 public interface ClientAccountInfoRepo extends CrudRepository<ClientAccountInfoEntity, Long> {
     Optional<ClientAccountInfoEntity> findByClientId(Long clientId);
-
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM ClientAccountInfoEntity c WHERE c.clientId = :clientId")
-    void deleteByClientId(@Param("clientId") Long clientId);
-
 }

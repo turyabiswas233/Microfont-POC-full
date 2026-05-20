@@ -1,6 +1,7 @@
 package com.leads.sandbox.test.project.registration.repository;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,37 +12,35 @@ import java.time.LocalDateTime;
 public class ClientAddressEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "client_id", unique = true, nullable = false)
+    @NotNull
+    @Column(name = "client_id", unique = true)
     private Long clientId;
 
-    @Column(nullable = false)
+    @NotNull
     private String addressType;
 
-    @Column(nullable = false)
+    @NotNull
     private String country;
 
-    @Column(nullable = false)
+    @NotNull
     private String division;
 
-    @Column(nullable = false)
+    @NotNull
     private String district;
 
-    @Column(nullable = false)
+    @NotNull
     private String thana;
 
     @Column
     private String zipCode;
 
-    @Column(nullable = false)
+    @NotNull
     private String city;
 
-    @Column(nullable = false)
+    @NotNull
     private String mobileNumber;
 
-    @Column(nullable = false)
+    @NotNull
     private String email;
 
     @Column(nullable = false, length = 500)
@@ -57,19 +56,12 @@ public class ClientAddressEntity {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-            name = "client_info_id",
-            nullable = false,
-            unique = true
+            name = "client_id",
+            referencedColumnName = "client_id",
+            updatable = false,
+            insertable = false
     )
     private ClientInfoEntity clientInfoEntity;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getClientId() {
         return clientId;
