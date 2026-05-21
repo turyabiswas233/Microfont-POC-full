@@ -12,7 +12,7 @@ import java.util.Map;
 @Service
 public class ThanaServiceImpl implements ThanaService {
 
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
     public ThanaServiceImpl(AddressRepository addressRepository) {
         this.addressRepository = addressRepository;
     }

@@ -1,7 +1,5 @@
 package com.leads.sandbox.test.project.register.query;
 
-import java.time.LocalDateTime;
-
 public class RetrieveClientInfo {
     private String clientName;
     private Long clientId;

@@ -1,6 +1,5 @@
 package com.leads.sandbox.test.project.register.command;
 
-
 import java.time.LocalDate;
 
 public class UpdateClientAccountInfo {
