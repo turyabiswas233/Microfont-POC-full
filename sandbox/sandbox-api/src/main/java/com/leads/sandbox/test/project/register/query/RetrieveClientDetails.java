@@ -1,6 +1,6 @@
 package com.leads.sandbox.test.project.register.query;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class RetrieveClientDetails {
     private String fatherName;

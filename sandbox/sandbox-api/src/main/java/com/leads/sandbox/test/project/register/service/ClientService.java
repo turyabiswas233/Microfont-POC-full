@@ -1,7 +1,6 @@
 package com.leads.sandbox.test.project.register.service;
 
 import com.leads.sandbox.test.project.register.command.*;
-import com.leads.sandbox.test.project.register.query.*;
 
 public interface ClientService {
     RegisterClientId registerClientId(RegisterClientId client);
@@ -18,7 +17,7 @@ public interface ClientService {
 
     boolean updateClientAddress(Long clientId, UpdateClientAddress updateClientAddress);
     boolean updateClientAccountInfo(Long clientId, UpdateClientAccountInfo saveClientAccountInfo);
-    RetrieveClient updateFullClient(Long clientId, UpdateClientDetails updateClientDetails, UpdateClientAddress updateClientAddress, UpdateClientAccountInfo saveClientAccountInfo);
+    boolean updateFullClient(Long clientId, UpdateClientDetails updateClientDetails, UpdateClientAddress updateClientAddress, UpdateClientAccountInfo saveClientAccountInfo);
 
 }
 

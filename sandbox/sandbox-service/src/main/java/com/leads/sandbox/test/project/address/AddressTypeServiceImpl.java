@@ -1,44 +1,40 @@
 package com.leads.sandbox.test.project.address;
 
 import com.leads.sandbox.test.project.address.query.RetrieveAddressType;
-import com.leads.sandbox.test.project.address.repository.AddressTypeEntity;
-import com.leads.sandbox.test.project.address.repository.AddressTypeRepository;
+import com.leads.sandbox.test.project.address.repository.AddressRepository;
 import com.leads.sandbox.test.project.address.service.AddressTypeService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AddressTypeServiceImpl implements AddressTypeService {
-    private final AddressTypeRepository addressTypeRepository;
-    public AddressTypeServiceImpl(AddressTypeRepository addressTypeRepository) {
-        this.addressTypeRepository = addressTypeRepository;
+    private final AddressRepository addressRepository;
+    public AddressTypeServiceImpl(AddressRepository addressRepository) {
+        this.addressRepository = addressRepository;
     }
 
     @Override
     public List<RetrieveAddressType> retrieveFindAll() {
-        List<AddressTypeEntity> addressTypeEntityList = this.addressTypeRepository.findAll();
-        List<RetrieveAddressType> retrieveAddressTypes = new ArrayList<>();
-        for (AddressTypeEntity addressTypeEntity : addressTypeEntityList) {
+        List<Map<String, Object>> rows = addressRepository.getAllAddressTypes();
+        List<RetrieveAddressType> result = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
             RetrieveAddressType retrieveAddressType = new RetrieveAddressType();
-            retrieveAddressType.setId(addressTypeEntity.getId());
-            retrieveAddressType.setAddressTypeName(addressTypeEntity.getAddressTypeName());
-            retrieveAddressTypes.add(retrieveAddressType);
+            retrieveAddressType.setId(Long.parseLong(row.get("ID").toString()));
+            retrieveAddressType.setAddressTypeName((String) row.get("ADDRESS_TYPE_NAME"));
+            result.add(retrieveAddressType);
         }
-        return retrieveAddressTypes;
+        return result;
     }
 
     @Override
     public RetrieveAddressType retrieveAddressType(Long addressTypeId) {
-        AddressTypeEntity addressType =  addressTypeRepository.findById(addressTypeId).orElse(null);
-        if(addressType == null) {
-            return null;
-        }
+        Map<String, Object> res = addressRepository.getAddressTypeById(addressTypeId);
         RetrieveAddressType retrieveAddressType = new RetrieveAddressType();
-        retrieveAddressType.setId(addressType.getId());
-        retrieveAddressType.setAddressTypeName(addressType.getAddressTypeName());
+        retrieveAddressType.setId(Long.parseLong(res.get("ID").toString()));
+        retrieveAddressType.setAddressTypeName((String) res.get("ADDRESS_TYPE_NAME"));
         return retrieveAddressType;
-
     }
 }

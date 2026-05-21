@@ -1,15 +1,14 @@
 package com.leads.sandbox.test.project.register.query;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.sql.Date;
 
 public class RetrieveClientAccountInfo {
     private String officeCode;
     private String accountNumber;
     private String accountTitle;
-    private LocalDate accountOpenDate;
-    private LocalDate accountExpiryDate;
-    private BigDecimal limitAmount;
+    private Date accountOpenDate;
+    private Date accountExpiryDate;
+    private Long limitAmount;
 
     public String getOfficeCode() {
         return officeCode;
@@ -35,27 +34,27 @@ public class RetrieveClientAccountInfo {
         this.accountTitle = accountTitle;
     }
 
-    public LocalDate getAccountOpenDate() {
+    public Date getAccountOpenDate() {
         return accountOpenDate;
     }
 
-    public void setAccountOpenDate(LocalDate accountOpenDate) {
+    public void setAccountOpenDate(Date accountOpenDate) {
         this.accountOpenDate = accountOpenDate;
     }
 
-    public LocalDate getAccountExpiryDate() {
+    public Date getAccountExpiryDate() {
         return accountExpiryDate;
     }
 
-    public void setAccountExpiryDate(LocalDate accountExpiryDate) {
+    public void setAccountExpiryDate(Date accountExpiryDate) {
         this.accountExpiryDate = accountExpiryDate;
     }
 
-    public BigDecimal getLimitAmount() {
+    public Long getLimitAmount() {
         return limitAmount;
     }
 
-    public void setLimitAmount(BigDecimal limitAmount) {
+    public void setLimitAmount(Long limitAmount) {
         this.limitAmount = limitAmount;
     }
 }

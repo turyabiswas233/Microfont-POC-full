@@ -1,46 +1,44 @@
 package com.leads.sandbox.test.project.address;
 
 import com.leads.sandbox.test.project.address.query.RetrieveThana;
-import com.leads.sandbox.test.project.address.repository.ThanaEntity;
-import com.leads.sandbox.test.project.address.repository.ThanaRepository;
+import com.leads.sandbox.test.project.address.repository.AddressRepository;
 import com.leads.sandbox.test.project.address.service.ThanaService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ThanaServiceImpl implements ThanaService {
 
-    private final ThanaRepository repository;
-
-    public ThanaServiceImpl(ThanaRepository repository) {
-        this.repository = repository;
+    private AddressRepository addressRepository;
+    public ThanaServiceImpl(AddressRepository addressRepository) {
+        this.addressRepository = addressRepository;
     }
 
     @Override
     public List<RetrieveThana> findThanasByDistrictId(Long districtId) {
-        List<ThanaEntity> thanas = repository.findThanaEntitiesByDistrictEntityId(districtId);
-        List<RetrieveThana> responses = new ArrayList<>();
-        for (ThanaEntity thana : thanas) {
-            RetrieveThana response = new RetrieveThana();
-            response.setId(thana.getThanaId());
-            response.setThanaName(thana.getThanaName());
-            responses.add(response);
+        List<Map<String, Object>> rows = addressRepository.getAllThanasByDistrictId(districtId);
+        List<RetrieveThana> result = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            RetrieveThana retrieveThana = new RetrieveThana();
+            retrieveThana.setThanaName(row.get("thana_name").toString());
+            retrieveThana.setId(Long.parseLong(row.get("thana_id").toString()));
+            result.add(retrieveThana);
         }
-        return responses;
+        return result;
     }
 
     @Override
     public RetrieveThana retrieveThana(Long thanaId) {
-        ThanaEntity thana = repository.findById(thanaId).orElse(null);
-        if (thana == null) {
-            return null;
+        Map<String, Object> res = addressRepository.getThanaById(thanaId);
+        for(String k: res.keySet()) {
+            System.out.println("[THANA]"+k + " : " + res.get(k));
         }
         RetrieveThana retrieveThana = new RetrieveThana();
-        retrieveThana.setId(thanaId);
-        retrieveThana.setThanaName(thana.getThanaName());
-
+        retrieveThana.setThanaName(res.get("thana_name").toString());
+        retrieveThana.setId(Long.parseLong(res.get("thana_id").toString()));
         return retrieveThana;
     }
 }

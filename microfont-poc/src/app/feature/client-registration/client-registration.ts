@@ -5,13 +5,12 @@ import {
   signal,
   SimpleChanges,
 } from '@angular/core';
-import { Subscription, firstValueFrom, forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Subscription, firstValueFrom, forkJoin } from 'rxjs';
 import { ClientInfo } from '../client-info/client-info';
 import { ClientDetails } from '../client-details/client-details';
 import { ClientAddress } from '../client-address/client-address';
 import { ClientAccountinfo } from '../client-accountinfo/client-accountinfo';
-import { CustomAlert } from '../custom-alert/custom-alert';
+import { AlertVariant, CustomAlert } from '../custom-alert/custom-alert';
 import {
   FormBuilder,
   FormGroup,
@@ -119,6 +118,7 @@ export class ClientRegistration {
   isSuccessModalOpen = signal(false);
   successModalTitle = signal('Success!');
   successModalMessage = signal('');
+  successStatus = signal<AlertVariant>('success');
   successAction: 'create' | 'update' | null = null;
 
   get clientInfoForm(): FormGroup {
@@ -548,7 +548,14 @@ export class ClientRegistration {
       registerClientAddress: any;
       registerClientAccountInfo: any;
     } = {
-      registerClientDetails: this.clientDetailsForm.value,
+      registerClientDetails: {
+        ...this.clientDetailsForm.value,
+        dateOfBirth: this.clientDetailsForm.get('dateOfBirth')?.value
+          ? new Date(
+              this.clientDetailsForm.get('dateOfBirth')?.value,
+            ).toISOString()
+          : null,
+      },
       registerClientAddress: {
         ...this.clientAddressForm.value,
         addressType: this.addressTypes.find(
@@ -571,7 +578,19 @@ export class ClientRegistration {
           (t) => t.thanaName === this.clientAddressForm.get('thana')?.value,
         )?.id,
       },
-      registerClientAccountInfo: this.accountInfoForm.value,
+      registerClientAccountInfo: {
+        ...this.accountInfoForm.value,
+        accountOpenDate: this.accountInfoForm.get('accountOpenDate')?.value
+          ? new Date(
+              this.accountInfoForm.get('accountOpenDate')?.value,
+            ).toISOString()
+          : null,
+        accountExpiryDate: this.accountInfoForm.get('accountExpiryDate')?.value
+          ? new Date(
+              this.accountInfoForm.get('accountExpiryDate')?.value,
+            ).toISOString()
+          : null,
+      },
     };
 
     if (this.clientId) {
@@ -651,12 +670,20 @@ export class ClientRegistration {
     this.clientService.createClient(this.clientId!, payload).subscribe({
       next: (client) => {
         this.isSaving = false;
-        this.clientId = client.id;
-        this.errorMessage = null;
-        this.openSuccessModal(
-          'Client registration completed successfully.',
-          'create',
-        );
+        if (client === true)
+          this.openSuccessModal(
+            'Client registration completed successfully.',
+            'create',
+            'success',
+          );
+        else {
+          this.errorMessage = 'Failed to create client.';
+          this.openSuccessModal(
+            'Client registration failed.',
+            'create',
+            'error',
+          );
+        }
       },
       error: () => {
         this.isSaving = false;
@@ -670,13 +697,29 @@ export class ClientRegistration {
     this.clientService.updateClient(this.clientId!, payload).subscribe({
       next: (client) => {
         this.isSaving = false;
-        this.clientId = client.id;
-        this.errorMessage = null;
-        this.openSuccessModal('Client updated successfully.', 'update');
+        if (client === true)
+          this.openSuccessModal(
+            'Client registration updated successfully.',
+            'update',
+            'success',
+          );
+        else {
+          this.errorMessage = 'Failed to update client.';
+          this.openSuccessModal(
+            'Client registration failed.',
+            'update',
+            'error',
+          );
+        }
       },
       error: () => {
         this.isSaving = false;
         this.errorMessage = 'Failed to update client.';
+        this.openSuccessModal(
+          'Client registration update failed.',
+          'update',
+          'error',
+        );
       },
     });
   }
@@ -696,9 +739,14 @@ export class ClientRegistration {
     }
   }
 
-  private openSuccessModal(message: string, action: 'create' | 'update'): void {
+  private openSuccessModal(
+    message: string,
+    action: 'create' | 'update',
+    variant: AlertVariant = 'success',
+  ): void {
     this.successAction = action;
     this.successModalMessage.set(message);
+    this.successStatus.set(variant);
     this.isSuccessModalOpen.set(true);
   }
 

@@ -7,7 +7,7 @@
     [isOpen]="isSuccessModalOpen()"
     [title]="successModalTitle()"
     [message]="successModalMessage()"
-    [variant]="'success'"
+    [variant]="successStatus()"
     (close)="closeSuccessModal()"
     (buttonClick)="onSuccessModalButtonClick()"
   />

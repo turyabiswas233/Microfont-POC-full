@@ -1,45 +1,44 @@
 package com.leads.sandbox.test.project.address;
 
 import com.leads.sandbox.test.project.address.query.RetrieveCountry;
-import com.leads.sandbox.test.project.address.repository.CountryEntity;
-import com.leads.sandbox.test.project.address.repository.CountryRepository;
+import com.leads.sandbox.test.project.address.repository.AddressRepository;
 import com.leads.sandbox.test.project.address.service.CountryService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 
 @Service
 public class CountryServiceImpl implements CountryService {
-    private final CountryRepository repository;
-
-    public CountryServiceImpl(CountryRepository repository) {
-        this.repository = repository;
+    private final AddressRepository addressRepository;
+    public CountryServiceImpl(AddressRepository addressRepository) {
+        this.addressRepository = addressRepository;
     }
-
 
     @Override
     public List<RetrieveCountry> retrieveFindAll() {
-        List<CountryEntity> countries = repository.findAll();
-        List<RetrieveCountry> countryResponses = new ArrayList<>();
-        for (CountryEntity country : countries) {
-            RetrieveCountry countryResponse = new RetrieveCountry();
-            countryResponse.setCountryName(country.getCountryName());
-            countryResponse.setId(country.getId());
-            countryResponses.add(countryResponse);
+        List<Map<String, Object>> rows = addressRepository.getAllCountries();
+        List<RetrieveCountry> result = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            RetrieveCountry retrieveCountry = new RetrieveCountry();
+            retrieveCountry.setId(Long.parseLong( row.get("id").toString()));
+            retrieveCountry.setCountryName(row.get("country_name").toString());
+            result.add(retrieveCountry);
         }
-        return countryResponses;
+        return result;
     }
 
     @Override
     public RetrieveCountry retrieveCountry(Long countryId) {
-        CountryEntity country =  repository.findById(countryId).orElse(null);
-        if(country == null) {
-            return null;
+        Map<String, Object> res = addressRepository.getCountryById(countryId);
+        for(String k: res.keySet()) {
+            System.out.println("[COUNTRY]"+k + " : " + res.get(k));
         }
-        RetrieveCountry countryResponse = new RetrieveCountry();
-        countryResponse.setCountryName(country.getCountryName());
-        countryResponse.setId(country.getId());
-        return countryResponse;
+        RetrieveCountry retrieveCountry = new RetrieveCountry();
+        retrieveCountry.setId(Long.parseLong(res.get("id").toString()));
+        retrieveCountry.setCountryName(res.get("country_name").toString());
+        return retrieveCountry;
     }
 }

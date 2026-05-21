@@ -1,6 +1,6 @@
 package com.leads.sandbox.test.project.register.command;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class UpdateClientDetails {
     private long clientId;

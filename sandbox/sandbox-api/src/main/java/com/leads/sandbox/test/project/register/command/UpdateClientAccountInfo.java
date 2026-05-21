@@ -1,6 +1,6 @@
 package com.leads.sandbox.test.project.register.command;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 
 public class UpdateClientAccountInfo {
@@ -9,7 +9,7 @@ public class UpdateClientAccountInfo {
     private String accountTitle;
     private String officeCode;
     private LocalDate accountOpenDate;
-    private BigDecimal limitAmount;
+    private Long limitAmount;
     private LocalDate accountExpiryDate;
 
     public String getAccountNumber() {
@@ -44,11 +44,11 @@ public class UpdateClientAccountInfo {
         this.accountOpenDate = accountOpenDate;
     }
 
-    public BigDecimal getLimitAmount() {
+    public Long getLimitAmount() {
         return limitAmount;
     }
 
-    public void setLimitAmount(BigDecimal limitAmount) {
+    public void setLimitAmount(Long limitAmount) {
         this.limitAmount = limitAmount;
     }
 
